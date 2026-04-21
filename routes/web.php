@@ -26,6 +26,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin,leader'])->group(function () {
+    Route::get('users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
+    Route::get('users/export/pdf', [UserController::class, 'exportPdf'])->name('users.export.pdf');
+    Route::post('users/reset-grades', [UserController::class, 'resetGrades'])->name('users.reset-grades');
     Route::resource('/admin/users', UserController::class);
     Route::resource('/sessions', AttendanceSessionController::class);
     
@@ -33,6 +36,7 @@ Route::middleware(['auth', 'role:admin,leader'])->group(function () {
     Route::get('/sessions/{session}/mark', [AttendanceController::class, 'markingSheet'])->name('sessions.mark');
     Route::post('/sessions/{session}/mark', [AttendanceController::class, 'submitMarking'])->name('sessions.submit-mark');
     Route::get('/sessions/{session}/report', [AttendanceController::class, 'report'])->name('sessions.report');
+    Route::get('/sessions/{session}/logs', [AttendanceController::class, 'sessionLogs'])->name('sessions.logs');
 });
 
 Route::middleware(['auth'])->group(function() {

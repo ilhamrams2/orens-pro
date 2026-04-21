@@ -16,7 +16,13 @@ class AttendanceSessionController extends Controller
         $query = AttendanceSession::with(['organisation', 'division', 'creator']);
 
         if ($user->role === 'leader') {
-            $query->where('division_id', $user->division_id);
+            $query->where('division_id', $user->division_id)
+                  ->where('organisation_id', $user->organisation_id);
+        } elseif ($user->role === 'admin') {
+            $query->where('organisation_id', $user->organisation_id);
+        } elseif ($user->role !== 'superadmin') {
+            // Member or other roles
+            $query->where('organisation_id', $user->organisation_id);
         }
 
         $sessions = $query->latest()->get();
@@ -31,8 +37,18 @@ class AttendanceSessionController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
-        $organisations = Organisation::all();
-        $divisions = $user->role === 'admin' ? Division::all() : Division::where('id', $user->division_id)->get();
+        
+        if ($user->role === 'superadmin') {
+            $organisations = Organisation::all();
+            $divisions = Division::all();
+        } else {
+            $organisations = Organisation::where('id', $user->organisation_id)->get();
+            $divisions = Division::where('organisation_id', $user->organisation_id);
+            if ($user->role === 'leader') {
+                $divisions->where('id', $user->division_id);
+            }
+            $divisions = $divisions->get();
+        }
         
         return view('sessions.create', compact('organisations', 'divisions'));
     }
@@ -40,24 +56,38 @@ class AttendanceSessionController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+        
+        if ($user->role !== 'superadmin' && (int)$request->organisation_id !== $user->organisation_id) {
+            abort(403);
+        }
+
         $request->validate([
             'title' => 'required|string|max:200',
             'session_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
             'organisation_id' => 'required|exists:organisations,id',
-            'division_id' => $user->role === 'admin' ? 'nullable|exists:divisions,id' : 'required',
+            'division_id' => 'nullable|exists:divisions,id',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'radius' => 'nullable|integer|min:1',
         ]);
 
-        $divisionId = $user->role === 'admin' ? $request->division_id : $user->division_id;
+        $divisionId = $request->division_id;
+        if ($user->role === 'leader') {
+            $divisionId = $user->division_id;
+        }
 
         $session = AttendanceSession::create([
-            'organisation_id' => $user->role === 'admin' ? $request->organisation_id : $user->organisation_id,
+            'organisation_id' => $request->organisation_id,
             'division_id' => $divisionId,
             'title' => $request->title,
             'session_date' => $request->session_date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'radius' => $request->radius ?? 100, // Default 100m
             'qr_token' => Str::random(32),
             'is_active' => true,
             'created_by' => $user->id,
@@ -73,12 +103,20 @@ class AttendanceSessionController extends Controller
     public function edit(Request $request, AttendanceSession $session)
     {
         $user = $request->user();
+        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
+            abort(403);
+        }
         if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
             abort(403);
         }
 
-        $organisations = Organisation::all();
-        $divisions = $user->role === 'admin' ? Division::all() : Division::where('id', $user->division_id)->get();
+        if ($user->role === 'superadmin') {
+            $organisations = Organisation::all();
+            $divisions = Division::all();
+        } else {
+            $organisations = Organisation::where('id', $user->organisation_id)->get();
+            $divisions = Division::where('organisation_id', $user->organisation_id)->get();
+        }
 
         return view('sessions.edit', compact('session', 'organisations', 'divisions'));
     }
@@ -86,6 +124,9 @@ class AttendanceSessionController extends Controller
     public function update(Request $request, AttendanceSession $session)
     {
         $user = $request->user();
+        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
+            abort(403);
+        }
         if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
             abort(403);
         }
@@ -95,6 +136,9 @@ class AttendanceSessionController extends Controller
             'session_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'radius' => 'nullable|integer|min:1',
             'is_active' => 'required|boolean',
         ]);
 
@@ -110,6 +154,9 @@ class AttendanceSessionController extends Controller
     public function destroy(Request $request, AttendanceSession $session)
     {
         $user = $request->user();
+        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
+            abort(403);
+        }
         if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
             abort(403);
         }

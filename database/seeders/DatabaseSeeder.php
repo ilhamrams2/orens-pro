@@ -17,86 +17,133 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Organisation
-        $org = Organisation::create([
-            'name' => 'Orens Solution',
-            'address' => 'Prestasi Prima',
+        // --- SUPERADMIN (Global) ---
+        User::create([
+            'name' => 'Superadmin Orens',
+            'email' => 'superadmin@smkprestasiprima.sch.id',
+            'password' => Hash::make('password'),
+            'role' => 'superadmin',
         ]);
 
-        // 2. Create Divisions
-        $game = Division::create(['organisation_id' => $org->id, 'name' => 'Game']);
-        $web = Division::create(['organisation_id' => $org->id, 'name' => 'Web']);
-        $cyber = Division::create(['organisation_id' => $org->id, 'name' => 'Cyber']);
+        // --- ORGANISATION 1: ORENS SOLUTION ---
+        $org1 = Organisation::create([
+            'name' => 'Orens Solution',
+            'address' => 'Gedung A, Lt 2',
+        ]);
 
-        // 3. Create Users
-        // Admin
-        $admin = User::create([
-            'organisation_id' => $org->id,
-            'name' => 'Admin Orens',
-            'email' => 'admin@smkprestasiprima.sch.id',
+        $game = Division::create(['organisation_id' => $org1->id, 'name' => 'Game Development']);
+        $web = Division::create(['organisation_id' => $org1->id, 'name' => 'Web Development']);
+        $cyber = Division::create(['organisation_id' => $org1->id, 'name' => 'Cyber Security']);
+
+        // Users Org 1
+        $pembina1 = User::create([
+            'organisation_id' => $org1->id,
+            'name' => 'Pembina Orens Solution',
+            'email' => 'pembina1@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
 
-        // Leader Game
-        $leaderGame = User::create([
-            'organisation_id' => $org->id,
+        $pengurusGame = User::create([
+            'organisation_id' => $org1->id,
             'division_id' => $game->id,
-            'name' => 'Leader Game',
+            'name' => 'Pengurus Game',
             'email' => 'game@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
             'role' => 'leader',
         ]);
 
-        // Member Cyber
-        $memberCyber = User::create([
-            'organisation_id' => $org->id,
-            'division_id' => $cyber->id,
-            'name' => 'Member Cyber',
-            'email' => 'cyber@smaprestasiprima.sch.id',
+        // Loop for 3 members per division in Org 1
+        $divisionsOrg1 = [
+            ['name' => 'game', 'id' => $game->id, 'domain' => 'smkprestasiprima.sch.id'],
+            ['name' => 'web', 'id' => $web->id, 'domain' => 'smkprestasiprima.sch.id'],
+            ['name' => 'cyber', 'id' => $cyber->id, 'domain' => 'smaprestasiprima.sch.id'],
+        ];
+
+        foreach ($divisionsOrg1 as $div) {
+            for ($i = 1; $i <= 3; $i++) {
+                User::create([
+                    'organisation_id' => $org1->id,
+                    'division_id' => $div['id'],
+                    'name' => ucfirst($div['name']) . " Member $i",
+                    'email' => $div['name'] . $i . '@' . $div['domain'],
+                    'password' => Hash::make('password'),
+                    'role' => 'member',
+                ]);
+            }
+        }
+
+        // --- ORGANISATION 2: ORENS NETWORK ---
+        $org2 = Organisation::create([
+            'name' => 'Orens Network',
+            'address' => 'Gedung B, Lt 1',
+        ]);
+
+        $server = Division::create(['organisation_id' => $org2->id, 'name' => 'Server & Cloud']);
+        $infra = Division::create(['organisation_id' => $org2->id, 'name' => 'Network Infrastructure']);
+
+        // Users Org 2
+        $pembina2 = User::create([
+            'organisation_id' => $org2->id,
+            'name' => 'Pembina Orens Network',
+            'email' => 'pembina2@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
-            'role' => 'member',
+            'role' => 'admin',
         ]);
 
-        // 4. Create Attendance Sessions
-        // Global Session
-        $session1 = AttendanceSession::create([
-            'organisation_id' => $org->id,
-            'title' => 'Rapat Mingguan Orens',
-            'session_date' => now()->toDateString(),
-            'start_time' => '08:00',
-            'end_time' => '10:00',
-            'qr_token' => 'global-123',
-            'is_active' => true,
-            'created_by' => $admin->id,
+        $pengurusServer = User::create([
+            'organisation_id' => $org2->id,
+            'division_id' => $server->id,
+            'name' => 'Pengurus Server',
+            'email' => 'server@smaprestasiprima.sch.id',
+            'password' => Hash::make('password'),
+            'role' => 'leader',
         ]);
 
-        // Game Specific Session
-        $session2 = AttendanceSession::create([
-            'organisation_id' => $org->id,
+        // Loop for 3 members per division in Org 2
+        $divisionsOrg2 = [
+            ['name' => 'server', 'id' => $server->id, 'domain' => 'smaprestasiprima.sch.id'],
+            ['name' => 'infra', 'id' => $infra->id, 'domain' => 'smkprestasiprima.sch.id'],
+        ];
+
+        foreach ($divisionsOrg2 as $div) {
+            for ($i = 1; $i <= 3; $i++) {
+                User::create([
+                    'organisation_id' => $org2->id,
+                    'division_id' => $div['id'],
+                    'name' => ucfirst($div['name']) . " Member $i",
+                    'email' => $div['name'] . $i . '@' . $div['domain'],
+                    'password' => Hash::make('password'),
+                    'role' => 'member',
+                ]);
+            }
+        }
+
+        // --- SESSIONS ---
+        // Session for Org 1 (Solution)
+        AttendanceSession::create([
+            'organisation_id' => $org1->id,
             'division_id' => $game->id,
-            'title' => 'Project Game Development',
+            'title' => 'Workshop Game Dev Solution',
+            'session_date' => now()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '12:00',
+            'qr_token' => 'sol-game-1',
+            'is_active' => true,
+            'created_by' => $pengurusGame->id,
+        ]);
+
+        // Session for Org 2 (Network)
+        AttendanceSession::create([
+            'organisation_id' => $org2->id,
+            'division_id' => $server->id,
+            'title' => 'Server Maintenance Training',
             'session_date' => now()->toDateString(),
             'start_time' => '13:00',
-            'end_time' => '15:00',
-            'qr_token' => 'game-456',
+            'end_time' => '16:00',
+            'qr_token' => 'net-server-1',
             'is_active' => true,
-            'created_by' => $leaderGame->id,
-        ]);
-
-        // 5. Create Sample Attendance
-        Attendance::create([
-            'user_id' => $memberCyber->id,
-            'session_id' => $session1->id,
-            'checkin_time' => now(),
-            'status' => 'hadir'
-        ]);
-        
-        Attendance::create([
-            'user_id' => $leaderGame->id,
-            'session_id' => $session1->id,
-            'checkin_time' => now(),
-            'status' => 'hadir'
+            'created_by' => $pengurusServer->id,
         ]);
     }
 }

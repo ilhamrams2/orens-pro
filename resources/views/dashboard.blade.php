@@ -2,6 +2,25 @@
 
 @section('content')
 <div class="space-y-8 animate-fade-in">
+    <!-- Header with Identity -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-black text-gray-800 font-outfit tracking-tight">Dashboard Overview</h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="w-2 h-2 rounded-full bg-orens animate-pulse"></span>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
+                @if(auth()->user()->role === 'leader' && isset($division))
+                    <span class="text-gray-300">•</span>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ $division->name }} Division</p>
+                @endif
+            </div>
+        </div>
+        <div class="bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm text-xs font-bold text-gray-500 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            System Live: {{ now()->format('d M Y') }}
+        </div>
+    </div>
+
     <!-- Role Specific Summary Icons -->
     @if(auth()->user()->role !== 'member')
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -54,8 +73,8 @@
             <div class="space-y-4">
                 @forelse($today_sessions ?? [] as $session)
                     @php
-                        $startTime = \Carbon\Carbon::parse($session->session_date . ' ' . $session->start_time);
-                        $endTime = \Carbon\Carbon::parse($session->session_date . ' ' . $session->end_time);
+                        $startTime = \Carbon\Carbon::parse(($session->session_date ?? today()->toDateString()) . ' ' . ($session->start_time ?? '00:00:00'));
+                        $endTime = \Carbon\Carbon::parse(($session->session_date ?? today()->toDateString()) . ' ' . ($session->end_time ?? '23:59:59'));
                         $now = now();
                         $isTooEarly = $now->lt($startTime->copy()->subMinutes(30));
                         $isHappening = $now->between($startTime->copy()->subMinutes(30), $endTime);
@@ -66,21 +85,22 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div>
-                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">{{ $session->organisation->name ?? 'Organisation' }}</p>
+                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">{{ $session->organisation?->name ?? 'Organisation' }}</p>
                             <h3 class="text-sm font-bold text-gray-800 leading-tight group-hover:text-orens transition-colors">{{ $session->title }}</h3>
                         </div>
                         </div>
 
-                        @if($session->attendances->isNotEmpty())
+                        @if($session->attendances?->isNotEmpty())
                             <span class="px-5 py-2.5 bg-green-50 text-green-500 rounded-xl text-xs font-bold border border-green-100 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                 Sudah Absen
                             </span>
                         @elseif($isHappening)
-                            <form action="{{ route('sessions.checkin', $session) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="px-5 py-2.5 bg-orens text-white rounded-xl text-xs font-bold hover:bg-orens-light transition-all shadow-md shadow-orens/10">Check-in</button>
-                            </form>
+                            <button type="button" onclick="openScanner('{{ $session->id }}', '{{ $session->title }}')" 
+                                class="px-5 py-2.5 bg-orens text-white rounded-xl text-xs font-bold hover:bg-orens-light transition-all shadow-md shadow-orens/10 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                Scan QR
+                            </button>
                         @elseif($isTooEarly)
                             <div class="flex flex-col items-end gap-1">
                                 <span class="px-3 py-1 bg-gray-100 text-gray-400 rounded-full text-[10px] font-bold uppercase border border-gray-200">Sesi Belum Dimulai</span>
@@ -123,21 +143,33 @@
             @endif
         </div>
 
-        <!-- Participation Card -->
-        <div class="bg-orens rounded-[32px] p-8 flex flex-col justify-between text-white shadow-xl shadow-orens/20 relative overflow-hidden group">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
-            <div>
-                <p class="font-bold uppercase tracking-widest text-[10px] mb-2 opacity-80">Total Partisipasi</p>
-                <h4 class="text-7xl font-black font-outfit mb-4">{{ $total_join ?? 0 }}</h4>
+        <!-- Participation & Stats -->
+        <div class="flex flex-col gap-8">
+            <div class="bg-orens rounded-[32px] p-8 flex flex-col justify-between text-white shadow-xl shadow-orens/20 relative overflow-hidden group h-1/2">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
+                <div>
+                    <p class="font-bold uppercase tracking-widest text-[10px] mb-2 opacity-80">Total Partisipasi</p>
+                    <h4 class="text-7xl font-black font-outfit mb-4">{{ $total_join ?? 0 }}</h4>
+                </div>
+                <div>
+                    <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-orens rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg">
+                        Lihat Riwayat
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </a>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium opacity-90 mb-4 italic text-balance leading-relaxed text-orens-light/20">
+
+            <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex flex-col justify-between h-1/2">
+                <div>
+                    <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Attendance Rate</p>
+                    <h4 class="text-5xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</h4>
+                </div>
+                <p class="text-xs font-medium text-gray-400 mt-4 leading-relaxed italic">
                     "Kedisiplinan adalah jembatan antara cita-cita dan pencapaian."
                 </p>
-                <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-orens rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg">
-                    Lihat Riwayat
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                </a>
             </div>
         </div>
     </div>
@@ -164,9 +196,9 @@
                     @forelse($recent_activity ?? [] as $item)
                         @php
                             $isAttendance = $item instanceof \App\Models\Attendance;
-                            $title = $isAttendance ? ($item->session->title ?? 'Untitled') : ($item->title ?? 'Untitled');
-                            $date = $isAttendance ? ($item->session->session_date ?? '-') : ($item->session_date ?? '-');
-                            $subtext = $isAttendance ? ($item->session->start_time ?? '') : ($item->division->name ?? 'Global');
+                            $title = $isAttendance ? ($item->session?->title ?? 'Untitled') : ($item->title ?? 'Untitled');
+                            $date = $isAttendance ? ($item->session?->session_date ?? '-') : ($item->session_date ?? '-');
+                            $subtext = $isAttendance ? ($item->session?->start_time ?? '') : ($item->division?->name ?? 'Global');
                             $status = $isAttendance ? ($item->status) : ($item->is_active ? 'active' : 'inactive');
                         @endphp
                         <tr class="hover:bg-gray-25 transition-all">
@@ -174,13 +206,12 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                                    <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-800">{{ $attendance->session->title ?? 'Session' }}</span>
-                                        <span class="text-[10px] text-gray-400 font-medium">{{ $attendance->session->organisation->name ?? 'Organisation' }}</span>
                                     </div>
-                                </td>
-</div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-gray-800">{{ $title }}</span>
+                                        <span class="text-[10px] text-gray-400 font-medium">{{ $subtext }}</span>
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-8 py-5">
                                 <span class="text-sm font-bold text-gray-600 block">{{ $date }}</span>
@@ -215,4 +246,125 @@
         animation: fade-in 0.6s ease-out forwards;
     }
 </style>
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-gray-900/80 backdrop-blur-md animate-fade-in">
+        <div class="bg-white rounded-[40px] shadow-2xl max-w-lg w-full overflow-hidden relative">
+            <div class="p-8 border-b border-gray-50 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-black text-gray-800 font-outfit" id="scannerTitle">Scan QR Code</h3>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Authenticating Location...</p>
+                </div>
+                <button onclick="closeScanner()" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="reader" style="width: 100%" class="bg-gray-900 aspect-square"></div>
+            
+            <div class="p-8 bg-gray-50 text-center">
+                <p class="text-xs text-gray-500 font-medium leading-relaxed">
+                    Arahkan kamera ke QR Code yang ditampilkan oleh Pembina/Pengurus. Pastikan GPS Anda aktif.
+                </p>
+                <div id="gpsStatus" class="mt-4 flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400">
+                    <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                    Waiting for GPS...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let html5QrCode;
+        let currentSessionId;
+        let userCoords = null;
+
+        function openScanner(sessionId, title) {
+            currentSessionId = sessionId;
+            document.getElementById('scannerTitle').textContent = `Presensi: ${title}`;
+            document.getElementById('scannerModal').classList.remove('hidden');
+            document.getElementById('scannerModal').classList.add('flex');
+
+            // Start GPS tracking immediately
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        userCoords = pos.coords;
+                        const status = document.getElementById('gpsStatus');
+                        status.querySelector('span').className = "w-2 h-2 rounded-full bg-green-500 animate-pulse";
+                        status.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> GPS Active: ${userCoords.latitude.toFixed(4)}, ${userCoords.longitude.toFixed(4)}`;
+                        startQrReader();
+                    },
+                    (err) => {
+                        showToast('error', 'GPS Error', 'Harap aktifkan GPS untuk melaukan absensi.');
+                        closeScanner();
+                    }
+                );
+            } else {
+                showToast('error', 'Browser Error', 'Browser Anda tidak mendukung GPS.');
+                closeScanner();
+            }
+        }
+
+        function startQrReader() {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .catch((err) => {
+                    console.error(err);
+                    showToast('error', 'Camera Error', 'Gagal mengakses kamera.');
+                    closeScanner();
+                });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // decodedText is the token
+            html5QrCode.stop().then(() => {
+                submitAttendance(decodedText);
+            });
+        }
+
+        function submitAttendance(token) {
+            if (!userCoords) {
+                showToast('error', 'GPS Required', 'Lokasi Anda belum terdeteksi.');
+                return;
+            }
+
+            fetch(`/sessions/${currentSessionId}/checkin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    qr_token: token,
+                    latitude: userCoords.latitude,
+                    longitude: userCoords.longitude
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', 'Berhasil!', data.message);
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast('error', 'Gagal!', data.message);
+                    closeScanner();
+                }
+            })
+            .catch(err => {
+                showToast('error', 'Error', 'Terjadi kesalahan sistem.');
+                closeScanner();
+            });
+        }
+
+        function closeScanner() {
+            if (html5QrCode && html5QrCode.getState() === 2) {
+                html5QrCode.stop();
+            }
+            document.getElementById('scannerModal').classList.add('hidden');
+            document.getElementById('scannerModal').classList.remove('flex');
+            userCoords = null;
+        }
+    </script>
 @endsection

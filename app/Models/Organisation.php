@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organisation extends Model
 {
-    protected $fillable = ['name', 'description', 'has_division'];
+    protected $fillable = ['name', 'description', 'has_division', 'last_grade_reset_at'];
 
     public function divisions()
     {

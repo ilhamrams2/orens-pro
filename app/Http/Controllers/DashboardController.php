@@ -14,8 +14,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         
-        if ($user->role === 'admin') {
-            return $this->adminStats();
+        if ($user->role === 'superadmin') {
+            return $this->superadminStats();
+        } elseif ($user->role === 'admin') {
+            return $this->adminStats($user);
         } elseif ($user->role === 'leader') {
             return $this->leaderStats($user);
         } else {
@@ -23,7 +25,7 @@ class DashboardController extends Controller
         }
     }
 
-    private function adminStats()
+    private function superadminStats()
     {
         $nowTime = now()->format('H:i:s');
         $today = now()->toDateString();
@@ -33,7 +35,6 @@ class DashboardController extends Controller
         $totalSessions = AttendanceSession::count();
         $totalAttendances = Attendance::count();
 
-        // Active Sessions: is_active AND today AND currently within time window
         $activeSessionsCount = AttendanceSession::where('is_active', true)
             ->where('session_date', $today)
             ->where('start_time', '<=', $nowTime)
@@ -55,13 +56,84 @@ class DashboardController extends Controller
             ];
         });
 
+        $totalExpected = AttendanceSession::all()->sum(function($session) {
+            return User::where('organisation_id', $session->organisation_id)
+                ->where(function($q) use ($session) {
+                    if ($session->division_id) $q->where('division_id', $session->division_id);
+                })
+                ->where('role', 'member')
+                ->count();
+        });
+
         return view('dashboard', [
+            'organisation_name' => 'Global System Administration',
             'total_users' => $totalUsers,
             'total_sessions' => $totalSessions,
             'total_attendances' => $totalAttendances,
+            'attendance_rate' => $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 2) : 0,
             'active_sessions' => $activeSessionsCount,
             'division_stats' => $divisionStats,
             'recent_activity' => AttendanceSession::with('division')->latest()->take(5)->get()
+        ]);
+    }
+
+    private function adminStats($user)
+    {
+        $nowTime = now()->format('H:i:s');
+        $today = now()->toDateString();
+        $orgId = $user->organisation_id;
+
+        $divisions = Division::where('organisation_id', $orgId)->withCount(['users' => function($q) use ($orgId) {
+            $q->where('organisation_id', $orgId);
+        }])->get();
+        
+        $totalUsers = User::where('organisation_id', $orgId)->count();
+        $totalSessions = AttendanceSession::where('organisation_id', $orgId)->count();
+        $totalAttendances = Attendance::whereHas('session', function($q) use ($orgId) {
+            $q->where('organisation_id', $orgId);
+        })->count();
+
+        // Active Sessions: is_active AND today AND currently within time window
+        $activeSessionsCount = AttendanceSession::where('organisation_id', $orgId)
+            ->where('is_active', true)
+            ->where('session_date', $today)
+            ->where('start_time', '<=', $nowTime)
+            ->where('end_time', '>=', $nowTime)
+            ->count();
+
+        $divisionStats = $divisions->map(function ($division) use ($orgId) {
+            $sessions = AttendanceSession::where('division_id', $division->id)->where('organisation_id', $orgId)->pluck('id');
+            $attendancesCount = Attendance::whereIn('session_id', $sessions)->count();
+            $expectedCount = $sessions->count() * $division->users_count;
+            
+            return [
+                'id' => $division->id,
+                'name' => $division->name,
+                'user_count' => $division->users_count,
+                'session_count' => $sessions->count(),
+                'attendance_count' => $attendancesCount,
+                'attendance_rate' => $expectedCount > 0 ? round(($attendancesCount / $expectedCount) * 100, 2) : 0
+            ];
+        });
+
+        $totalExpected = AttendanceSession::where('organisation_id', $orgId)->get()->sum(function($session) use ($orgId) {
+            return User::where('organisation_id', $orgId)
+                ->where('role', 'member')
+                ->where(function($q) use ($session) {
+                    if ($session->division_id) $q->where('division_id', $session->division_id);
+                })
+                ->count();
+        });
+
+        return view('dashboard', [
+            'organisation_name' => $user->organisation->name ?? 'Organisation',
+            'total_users' => $totalUsers,
+            'total_sessions' => $totalSessions,
+            'total_attendances' => $totalAttendances,
+            'attendance_rate' => $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 2) : 0,
+            'active_sessions' => $activeSessionsCount,
+            'division_stats' => $divisionStats,
+            'recent_activity' => AttendanceSession::where('organisation_id', $orgId)->with('division')->latest()->take(5)->get()
         ]);
     }
 
@@ -69,17 +141,25 @@ class DashboardController extends Controller
     {
         $division = $user->division;
         if (!$division) return abort(403, 'Anda tidak memiliki divisi.');
+        $orgId = $user->organisation_id;
 
         $nowTime = now()->format('H:i:s');
         $today = now()->toDateString();
 
-        $membersCount = User::where('division_id', $division->id)->count();
-        $allSessions = AttendanceSession::where('division_id', $division->id)->get();
+        $membersCount = User::where('division_id', $division->id)
+            ->where('organisation_id', $orgId)
+            ->count();
+            
+        $allSessions = AttendanceSession::where('division_id', $division->id)
+            ->where('organisation_id', $orgId)
+            ->get();
+            
         $sessionsCount = $allSessions->count();
         $attendancesCount = Attendance::whereIn('session_id', $allSessions->pluck('id'))->count();
         $expectedCount = $sessionsCount * $membersCount;
 
         $activeSessionsCount = AttendanceSession::where('division_id', $division->id)
+            ->where('organisation_id', $orgId)
             ->where('is_active', true)
             ->where('session_date', $today)
             ->where('start_time', '<=', $nowTime)
@@ -87,6 +167,7 @@ class DashboardController extends Controller
             ->count();
 
         return view('dashboard', [
+            'organisation_name' => $user->organisation->name ?? 'Organisation',
             'division' => $division,
             'members_count' => $membersCount,
             'sessions_count' => $sessionsCount,
@@ -109,13 +190,17 @@ class DashboardController extends Controller
             })->where('is_active', true);
 
         $todaySessions = (clone $baseQuery)->where('session_date', $today)
-            ->with(['attendances' => function($q) use ($user) {
+            ->with(['organisation', 'attendances' => function($q) use ($user) {
                 $q->where('user_id', $user->id);
             }])->get();
         $upcomingSessions = (clone $baseQuery)->where('session_date', '>', $today)->orderBy('session_date')->orderBy('start_time')->take(5)->get();
         
+        $eligibleSessionsCount = $baseQuery->count();
+
         return view('dashboard', [
+            'organisation_name' => $user->organisation->name ?? 'Organisation',
             'total_join' => $totalJoin,
+            'attendance_rate' => $eligibleSessionsCount > 0 ? round(($totalJoin / $eligibleSessionsCount) * 100, 2) : 0,
             'recent_activity' => $attendances->take(5),
             'today_sessions' => $todaySessions,
             'upcoming_sessions' => $upcomingSessions

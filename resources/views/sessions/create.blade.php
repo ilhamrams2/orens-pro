@@ -75,6 +75,50 @@
                     </div>
                 </div>
 
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-extrabold text-gray-700 uppercase tracking-wider">Geofencing (GPS)</label>
+                        <button type="button" onclick="getLocation()" class="text-xs font-bold text-orens hover:underline flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Get Current Location
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <input type="text" id="latitude" name="latitude" value="{{ old('latitude', $session->latitude ?? '') }}"
+                                class="w-full p-3 rounded-xl border border-gray-100 bg-white outline-none focus:border-orens transition-all text-xs font-bold"
+                                placeholder="Latitude">
+                        </div>
+                        <div class="space-y-1">
+                            <input type="text" id="longitude" name="longitude" value="{{ old('longitude', $session->longitude ?? '') }}"
+                                class="w-full p-3 rounded-xl border border-gray-100 bg-white outline-none focus:border-orens transition-all text-xs font-bold"
+                                placeholder="Longitude">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Radius (Meters)</label>
+                        <input type="number" name="radius" value="{{ old('radius', $session->radius ?? 100) }}"
+                            class="w-full p-3 rounded-xl border border-gray-100 bg-white outline-none focus:border-orens transition-all text-xs font-bold"
+                            placeholder="e.g. 100">
+                    </div>
+                    <p class="text-[10px] text-gray-400 font-medium italic">Members must be within this radius to check-in.</p>
+                </div>
+
+                <script>
+                    function getLocation() {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                document.getElementById('latitude').value = position.coords.latitude;
+                                document.getElementById('longitude').value = position.coords.longitude;
+                            }, function(error) {
+                                alert("Error getting location: " + error.message);
+                            });
+                        } else {
+                            alert("Geolocation is not supported by this browser.");
+                        }
+                    }
+                </script>
+
                 @if(isset($session))
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Status</label>
