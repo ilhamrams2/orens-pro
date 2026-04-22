@@ -23,3 +23,17 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# PHP settings untuk shared hosting
+<IfModule mod_php.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# Keamanan: blokir akses ke file sensitif
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

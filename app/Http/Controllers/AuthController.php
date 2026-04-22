@@ -6,11 +6,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function showLogin()
     {
+        if (Auth::check()) {
+            return redirect('/dashboard');
+        }
         return view('auth.login');
     }
 
@@ -18,45 +22,54 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|min:1',
         ]);
 
         $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
         $emailDomain = substr(strrchr($credentials['email'], "@"), 1);
 
         if (!in_array($emailDomain, $allowedDomains)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Login is restricted to Prestasiprima domains only.',
-                ], 403);
-            }
-
             return back()->withErrors([
-                'email' => 'Login is restricted to Prestasiprima domains only.',
+                'email' => 'Login hanya untuk domain Prestasiprima.',
             ])->onlyInput('email');
         }
 
-        if (Auth::attempt($credentials)) {
+        // Cek user aktif terlebih dahulu
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Email atau password tidak cocok.',
+            ])->onlyInput('email');
+        }
+
+        if (!$user->is_active) {
+            return back()->withErrors([
+                'email' => 'Akun Anda tidak aktif. Hubungi administrator.',
+            ])->onlyInput('email');
+        }
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
+
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'Login successful',
+                    'message' => 'Login berhasil',
                     'user' => Auth::user()
                 ]);
+            }
+
+            // Redirect berdasarkan role
+            $user = Auth::user();
+            if ($user->role === 'member') {
+                return redirect()->intended('/attendance');
             }
 
             return redirect()->intended('/dashboard');
         }
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'The provided credentials do not match our records.',
-            ], 401);
-        }
-
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Email atau password tidak cocok.',
         ])->onlyInput('email');
     }
 
@@ -65,12 +78,12 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Logged out']);
         }
 
-        return redirect('/');
+        return redirect('/login');
     }
 
     public function me()
