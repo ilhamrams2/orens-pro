@@ -5,19 +5,28 @@
     <!-- Header with Identity -->
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-black text-gray-800 font-outfit tracking-tight">Dashboard Overview</h1>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="w-2 h-2 rounded-full bg-orens animate-pulse"></span>
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
+            <h1 class="text-4xl font-black text-text-primary font-outfit tracking-tighter">Portal Overview</h1>
+            <div class="flex items-center gap-3 mt-2">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 bg-orens/10 rounded-full border border-orens/20">
+                    <span class="w-2 h-2 rounded-full bg-orens animate-pulse"></span>
+                    <p class="text-[10px] font-bold text-orens uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
+                </div>
                 @if(auth()->user()->role === 'leader' && isset($division))
-                    <span class="text-gray-300">•</span>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ $division->name }} Division</p>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full border border-gray-200">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $division->name }} Division</p>
+                    </div>
                 @endif
             </div>
         </div>
-        <div class="bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-sm text-xs font-bold text-gray-500 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-green-500"></span>
-            System Live: {{ now()->format('d M Y') }}
+        <div class="flex flex-col items-end gap-2">
+            <div class="glass-card px-4 py-2 text-[10px] font-bold text-gray-500 flex items-center gap-2 border-none bg-white shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                System Live: {{ now()->format('d M Y') }}
+            </div>
+            <div class="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-[9px] font-black uppercase tracking-tighter">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                PDPA Compliant & Audited
+            </div>
         </div>
     </div>
 

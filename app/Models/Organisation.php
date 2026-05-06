@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organisation extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory, \App\Traits\Auditable;
+
     protected $fillable = ['name', 'description', 'has_division', 'last_grade_reset_at'];
 
     public function divisions()

@@ -22,22 +22,34 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:1',
+            'password' => 'required|string|min:8',
         ]);
+
+        $throttleKey = strtolower($request->input('email')) . '|' . $request->ip();
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'email' => "Too many login attempts. Please try again in $seconds seconds.",
+            ])->onlyInput('email');
+        }
 
         $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
         $emailDomain = substr(strrchr($credentials['email'], "@"), 1);
 
         if (!in_array($emailDomain, $allowedDomains)) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey);
+            Log::warning('Login attempt with unauthorized domain: ' . $credentials['email'], ['ip' => $request->ip()]);
             return back()->withErrors([
                 'email' => 'Login hanya untuk domain Prestasiprima.',
             ])->onlyInput('email');
         }
 
-        // Cek user aktif terlebih dahulu
         $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user) {
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey);
+            Log::info('Failed login attempt for: ' . $credentials['email'], ['ip' => $request->ip()]);
             return back()->withErrors([
                 'email' => 'Email atau password tidak cocok.',
             ])->onlyInput('email');
@@ -50,7 +62,10 @@ class AuthController extends Controller
         }
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
+
+            Log::info('User logged in: ' . $user->email, ['role' => $user->role]);
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -59,7 +74,6 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Redirect berdasarkan role
             $user = Auth::user();
             if ($user->role === 'member') {
                 return redirect()->intended('/attendance');
