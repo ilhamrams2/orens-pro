@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('qr_token');
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
-            $table->string('result', 100)->nullable();
+            $table->text('result')->nullable();
             $table->timestamps();
         });
     }

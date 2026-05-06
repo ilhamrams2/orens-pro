@@ -68,24 +68,31 @@ class AttendanceService
             }
         }
 
-        // 5. Success - Save Attendance
-        Attendance::updateOrCreate(
-            ['session_id' => $session->id, 'user_id' => $user->id],
-            [
-                'status' => 'hadir', 
-                'checkin_time' => now(),
-                'latitude' => $lat,
-                'longitude' => $lng
-            ]
-        );
+        // 5. Success - Save Attendance & Log atomically
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($user, $session, $lat, $lng, $qrToken) {
+                Attendance::updateOrCreate(
+                    ['session_id' => $session->id, 'user_id' => $user->id],
+                    [
+                        'status' => 'hadir', 
+                        'checkin_time' => now(),
+                        'latitude' => $lat,
+                        'longitude' => $lng
+                    ]
+                );
 
-        AttendanceLog::create([
-            'user_id' => $user->id,
-            'qr_token' => $qrToken ?? 'N/A',
-            'latitude' => $lat,
-            'longitude' => $lng,
-            'result' => 'Check-in successful'
-        ]);
+                AttendanceLog::create([
+                    'user_id' => $user->id,
+                    'qr_token' => $qrToken ?? 'N/A',
+                    'latitude' => $lat,
+                    'longitude' => $lng,
+                    'result' => 'Check-in successful'
+                ]);
+            });
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Check-in save failed: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Gagal menyimpan data absensi. Silakan coba lagi.'];
+        }
 
         return [
             'success' => true,
