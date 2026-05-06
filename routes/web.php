@@ -37,6 +37,7 @@ Route::middleware(['auth', 'role:admin,leader'])->group(function () {
     Route::post('/sessions/{session}/mark', [AttendanceController::class, 'submitMarking'])->name('sessions.submit-mark');
     Route::get('/sessions/{session}/report', [AttendanceController::class, 'report'])->name('sessions.report');
     Route::get('/sessions/{session}/logs', [AttendanceController::class, 'sessionLogs'])->name('sessions.logs');
+    Route::post('/reports/multi', [AttendanceController::class, 'multiReport'])->name('reports.multi');
 });
 
 Route::middleware(['auth'])->group(function() {

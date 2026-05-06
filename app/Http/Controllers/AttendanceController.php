@@ -130,6 +130,70 @@ class AttendanceController extends Controller
             : back()->with('error', $result['message']);
     }
 
+    public function multiReport(Request $request)
+    {
+        $user = $request->user();
+        $sessionIds = $request->input('session_ids', []);
+
+        if (empty($sessionIds)) {
+            return back()->with('error', 'Please select at least one session.');
+        }
+
+        $sessions = AttendanceSession::whereIn('id', $sessionIds)
+            ->with(['organisation', 'division'])
+            ->orderBy('session_date')
+            ->get();
+
+        // Security check
+        foreach ($sessions as $session) {
+            if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
+                abort(403);
+            }
+        }
+
+        $organisationId = $sessions->first()->organisation_id;
+        
+        // Get all members who could have attended these sessions
+        $members = User::where('organisation_id', $organisationId)
+            ->where('role', 'member')
+            ->with('division')
+            ->get();
+
+        $attendances = Attendance::whereIn('session_id', $sessionIds)->get();
+        
+        $reportData = [];
+        foreach ($members as $member) {
+            $memberAttendances = $attendances->where('user_id', $member->id);
+            $presentCount = $memberAttendances->where('status', 'hadir')->count();
+            
+            $reportData[$member->id] = [
+                'name' => $member->name,
+                'division' => $member->division->name ?? 'N/A',
+                'present' => $presentCount,
+                'total' => $sessions->count(),
+                'percentage' => $sessions->count() > 0 ? round(($presentCount / $sessions->count()) * 100, 2) : 0
+            ];
+        }
+
+        // Division stats
+        $divisionStats = [];
+        $divisions = \App\Models\Division::where('organisation_id', $organisationId)->get();
+        
+        foreach ($divisions as $division) {
+            $divisionMembers = $members->where('division_id', $division->id);
+            $totalPossible = $divisionMembers->count() * $sessions->count();
+            $totalPresent = $attendances->whereIn('user_id', $divisionMembers->pluck('id'))->where('status', 'hadir')->count();
+            
+            $divisionStats[$division->name] = [
+                'present' => $totalPresent,
+                'total' => $totalPossible,
+                'percentage' => $totalPossible > 0 ? round(($totalPresent / $totalPossible) * 100, 2) : 0
+            ];
+        }
+
+        return view('sessions.multi_report', compact('sessions', 'reportData', 'divisionStats'));
+    }
+
     public function index(Request $request)
     {
         $attendances = Attendance::with(['session'])
