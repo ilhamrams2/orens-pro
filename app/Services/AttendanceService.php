@@ -50,9 +50,9 @@ class AttendanceService
             return $this->logAndFail($user, $session, $data, 'This session has already ended.');
         }
 
-        // 3. QR Token Validation
-        if ($session->qr_token !== $qrToken) {
-            return $this->logAndFail($user, $session, $data, 'Invalid QR Code. Please scan the official code.');
+        // 3. QR Token Validation (Singapore Enterprise Standard: Dynamic Tokens)
+        if (!$session->validateDynamicToken($qrToken)) {
+            return $this->logAndFail($user, $session, $data, 'Invalid or Expired QR Code. Please scan the current code.');
         }
 
         // 4. GPS Geofencing Validation

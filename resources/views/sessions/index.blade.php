@@ -2,22 +2,20 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Attendance Sessions</h1>
-            <p class="text-xs sm:text-sm text-gray-500">Create and manage attendance sessions for divisions.</p>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <button type="button" onclick="submitMultiReport()" title="Centang sesi di tabel terlebih dahulu" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-indigo-200 w-full sm:w-auto">
+    <x-ui.header title="Attendance Sessions" subtitle="Create and manage attendance sessions for divisions.">
+        <x-ui.button variant="secondary" onclick="submitMultiReport()" title="Centang sesi di tabel terlebih dahulu">
+            <x-slot name="icon">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>Report</span>
-            </button>
-            <a href="{{ route('sessions.create') }}" class="bg-orens text-white px-4 py-2.5 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-orens/20 w-full sm:w-auto">
+            </x-slot>
+            Report
+        </x-ui.button>
+        <x-ui.button :href="route('sessions.create')">
+            <x-slot name="icon">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                <span>New Session</span>
-            </a>
-        </div>
-    </div>
+            </x-slot>
+            New Session
+        </x-ui.button>
+    </x-ui.header>
 
     @if(session('success'))
         <div class="bg-green-50 border border-green-100 text-green-600 px-6 py-4 rounded-2xl font-medium text-sm mt-4">
@@ -74,7 +72,7 @@
                             </td>
                             <td class="px-4 lg:px-8 py-5 text-right">
                                     <div class="flex items-center gap-1 sm:gap-2 justify-end">
-                                        <button type="button" onclick="showQR('{{ $s->qr_token }}', '{{ $s->title }}')" class="p-2 text-gray-400 hover:text-green-500 transition-colors" title="Show QR Code">
+                                        <button type="button" onclick="showQR({{ $s->id }}, '{{ $s->title }}')" class="p-2 text-gray-400 hover:text-green-500 transition-colors" title="Show QR Code">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                         </button>
                                         <a href="{{ route('sessions.mark', $s) }}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors" title="Mark Attendance">
@@ -166,22 +164,43 @@
         form.submit();
     }
 
-    function showQR(token, title) {
+    let html5QrCode;
+    let currentSessionId;
+    let userCoords = null;
+    let qrRefreshInterval;
+
+    function showQR(sessionId, title) {
         const modal = document.getElementById('qrModal');
         const img = document.getElementById('qrImage');
         const titleEl = document.getElementById('qrTitle');
 
         titleEl.textContent = title;
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${token}`;
+        currentSessionId = sessionId;
+        
+        // Initial load
+        refreshQR();
+        
+        // Set interval for rotation (Singapore Standard: every 30s)
+        clearInterval(qrRefreshInterval);
+        qrRefreshInterval = setInterval(refreshQR, 10000); // Check every 10s for smooth transition
         
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+    }
+
+    function refreshQR() {
+        if (!currentSessionId) return;
+        const img = document.getElementById('qrImage');
+        // Add cache-buster to force refresh
+        img.src = `/sessions/${currentSessionId}/qr?t=` + new Date().getTime();
     }
 
     function hideQR() {
         const modal = document.getElementById('qrModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        clearInterval(qrRefreshInterval);
+        currentSessionId = null;
     }
 </script>
 @endsection

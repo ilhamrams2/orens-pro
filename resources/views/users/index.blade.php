@@ -2,26 +2,26 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Members</h1>
-            <p class="text-xs sm:text-sm text-gray-500">Manage all members and their performance grades.</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-            <a href="{{ route('users.export.excel') }}" class="bg-green-600 text-white px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-100 text-xs sm:text-sm flex-1 sm:flex-none">
+    <x-ui.header title="Members" subtitle="Manage all members and their performance grades.">
+        <x-ui.button variant="outline" size="sm" :href="route('users.export.excel')">
+            <x-slot name="icon">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>Excel</span>
-            </a>
-            <a href="{{ route('users.export.pdf') }}" class="bg-red-600 text-white px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-100 text-xs sm:text-sm flex-1 sm:flex-none">
+            </x-slot>
+            Excel
+        </x-ui.button>
+        <x-ui.button variant="outline" size="sm" :href="route('users.export.pdf')" class="!text-red-500 !border-red-100 hover:!bg-red-50">
+            <x-slot name="icon">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>PDF</span>
-            </a>
-            <a href="{{ route('users.create') }}" class="bg-orens text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-orens/10 text-xs sm:text-sm w-full sm:w-auto">
+            </x-slot>
+            PDF
+        </x-ui.button>
+        <x-ui.button :href="route('users.create')">
+            <x-slot name="icon">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                <span>Add Member</span>
-            </a>
-        </div>
-    </div>
+            </x-slot>
+            Add Member
+        </x-ui.button>
+    </x-ui.header>
 
     @if(($organisation ?? null) && (auth()->user()->role === 'admin' || auth()->user()->role === 'superadmin'))
         <div class="bg-blue-600 rounded-[32px] p-6 sm:p-8 text-white flex flex-col lg:flex-row justify-between items-center gap-6 shadow-xl shadow-blue-100 mb-8 mt-6">
@@ -39,10 +39,12 @@
             </div>
             <form action="{{ route('users.reset-grades') }}" method="POST" onsubmit="return confirm('PERINGATAN: Semua nilai member akan dihitung ulang dari nol sejak saat ini. Anda yakin?')" class="w-full lg:w-auto">
                 @csrf
-                <button type="submit" class="w-full lg:w-auto px-6 py-3 bg-white text-blue-600 rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <x-ui.button variant="outline" class="!bg-white !text-blue-600 w-full lg:w-auto">
+                    <x-slot name="icon">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </x-slot>
                     Reset Periode Nilai
-                </button>
+                </x-ui.button>
             </form>
         </div>
     @endif
@@ -124,6 +126,8 @@
                 </tbody>
             </table>
         </div>
+    <div class="mt-6">
+        {{ $users->links() }}
     </div>
 </div>
 @endsection

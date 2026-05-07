@@ -30,17 +30,19 @@ class UserController extends Controller
             abort(403);
         }
 
-        $users = $query->get()->map(function($u) {
+        $users = $query->paginate(10);
+        
+        $users->getCollection()->transform(function($u) {
             $count = $u->attendances_count;
             if ($count >= 4) {
                 $u->grade = 'A';
-                $u->grade_class = 'bg-green-100 text-green-800';
+                $u->grade_class = 'bg-green-50 text-green-600 border-green-100';
             } elseif ($count >= 2) {
                 $u->grade = 'B';
-                $u->grade_class = 'bg-blue-100 text-blue-800';
+                $u->grade_class = 'bg-blue-50 text-blue-600 border-blue-100';
             } else {
                 $u->grade = '-';
-                $u->grade_class = 'bg-gray-100 text-gray-800';
+                $u->grade_class = 'bg-gray-50 text-gray-500 border-gray-100';
             }
             return $u;
         });

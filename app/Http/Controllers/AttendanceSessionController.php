@@ -7,11 +7,13 @@ use App\Models\Organisation;
 use App\Models\Division;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AttendanceSessionController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', AttendanceSession::class);
         $user = $request->user();
         $query = AttendanceSession::with(['organisation', 'division', 'creator']);
 
@@ -20,12 +22,9 @@ class AttendanceSessionController extends Controller
                   ->where('organisation_id', $user->organisation_id);
         } elseif ($user->role === 'admin') {
             $query->where('organisation_id', $user->organisation_id);
-        } elseif ($user->role !== 'superadmin') {
-            // Member or other roles
-            $query->where('organisation_id', $user->organisation_id);
         }
 
-        $sessions = $query->latest()->get();
+        $sessions = $query->latest()->paginate(10);
 
         if (request()->expectsJson()) {
             return response()->json($sessions);
@@ -34,8 +33,32 @@ class AttendanceSessionController extends Controller
         return view('sessions.index', compact('sessions'));
     }
 
+    /**
+     * Local QR Generation Engine (Singapore Standard)
+     * Generates a dynamic QR code based on the 30-second rotating token.
+     */
+    public function getQr(AttendanceSession $session)
+    {
+        // Check permissions (Singapore Standard Policy)
+        $this->authorize('view', $session);
+
+        // Generate dynamic token
+        $dynamicToken = $session->dynamic_token;
+
+        // Create QR locally (No third-party dependency)
+        $qrCode = QrCode::size(300)
+            ->format('svg')
+            ->margin(2)
+            ->errorCorrection('H')
+            ->color(255, 107, 0) // Brand Color: Orens
+            ->generate($dynamicToken);
+
+        return response($qrCode)->header('Content-Type', 'image/svg+xml');
+    }
+
     public function create(Request $request)
     {
+        $this->authorize('create', AttendanceSession::class);
         $user = $request->user();
         
         if ($user->role === 'superadmin') {
@@ -55,11 +78,8 @@ class AttendanceSessionController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', AttendanceSession::class);
         $user = $request->user();
-        
-        if ($user->role !== 'superadmin' && (int)$request->organisation_id !== $user->organisation_id) {
-            abort(403);
-        }
 
         $request->validate([
             'title' => 'required|string|max:200',
@@ -102,13 +122,8 @@ class AttendanceSessionController extends Controller
 
     public function edit(Request $request, AttendanceSession $session)
     {
+        $this->authorize('update', $session);
         $user = $request->user();
-        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
-            abort(403);
-        }
-        if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
-            abort(403);
-        }
 
         if ($user->role === 'superadmin') {
             $organisations = Organisation::all();
@@ -123,13 +138,8 @@ class AttendanceSessionController extends Controller
 
     public function update(Request $request, AttendanceSession $session)
     {
+        $this->authorize('update', $session);
         $user = $request->user();
-        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
-            abort(403);
-        }
-        if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
-            abort(403);
-        }
 
         $request->validate([
             'title' => 'required|string|max:200',
@@ -153,13 +163,8 @@ class AttendanceSessionController extends Controller
 
     public function destroy(Request $request, AttendanceSession $session)
     {
+        $this->authorize('delete', $session);
         $user = $request->user();
-        if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
-            abort(403);
-        }
-        if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
-            abort(403);
-        }
 
         $session->delete();
 

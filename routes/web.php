@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:admin,leader'])->group(function () {
     Route::post('users/reset-grades', [UserController::class, 'resetGrades'])->name('users.reset-grades');
     Route::resource('/admin/users', UserController::class);
     Route::resource('/sessions', AttendanceSessionController::class);
+    Route::get('/sessions/{session}/qr', [AttendanceSessionController::class, 'getQr'])->name('sessions.qr');
     
     // Attendance marking for leaders/admins
     Route::get('/sessions/{session}/mark', [AttendanceController::class, 'markingSheet'])->name('sessions.mark');

@@ -37,6 +37,30 @@
     .input-premium {
         @apply w-full p-4 rounded-2xl border border-gray-100 bg-white/50 backdrop-blur-sm outline-none transition-all duration-300 focus:border-orens/50 focus:ring-4 focus:ring-orens/5 focus:bg-white;
     }
+
+    .badge-status {
+        @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border;
+    }
+
+    .badge-success {
+        @apply bg-green-50 text-green-600 border-green-100;
+    }
+
+    .badge-danger {
+        @apply bg-red-50 text-red-600 border-red-100;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-50 text-yellow-600 border-yellow-100;
+    }
+
+    .badge-info {
+        @apply bg-blue-50 text-blue-600 border-blue-100;
+    }
+
+    .sidebar-item-active {
+        @apply bg-orens text-white shadow-lg shadow-orens/20;
+    }
 }
 
 @keyframes float {
