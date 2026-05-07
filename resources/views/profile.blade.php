@@ -13,12 +13,12 @@
                 {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(strrchr($user->name, ' ') ?: ' ', 1, 1)) }}
             </div>
             
-            <div class="text-center md:text-left space-y-3">
+            <div class="text-center md:text-left space-y-3 flex-1">
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                    <h1 class="text-4xl md:text-5xl font-black text-gray-800 tracking-tight font-outfit">{{ $user->name }}</h1>
-                    <span class="px-4 py-1.5 bg-orens/10 text-orens rounded-full text-xs font-black uppercase tracking-widest border border-orens/20">{{ $user->role }}</span>
+                    <h1 class="text-2xl sm:text-3xl md:text-5xl font-black text-gray-800 tracking-tight font-outfit">{{ $user->name }}</h1>
+                    <span class="px-4 py-1.5 bg-orens/10 text-orens rounded-full text-[10px] font-black uppercase tracking-widest border border-orens/20">{{ $user->role }}</span>
                 </div>
-                <p class="text-lg text-gray-500 font-medium max-w-xl">{{ $user->email }}</p>
+                <p class="text-base sm:text-lg text-gray-500 font-medium max-w-xl truncate">{{ $user->email }}</p>
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
                     <span class="flex items-center gap-2 text-sm font-bold text-gray-400">
                         <svg class="w-4 h-4 text-orens" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -146,8 +146,8 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-4">
-                    <button type="submit" class="px-12 py-5 bg-gradient-to-r from-orens to-orange-600 text-white rounded-[24px] font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl shadow-orens/30 flex items-center gap-4 group active:scale-95">
+                <div class="flex justify-center md:justify-end pt-4">
+                    <button type="submit" class="w-full md:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-orens to-orange-600 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] sm:text-xs hover:scale-105 transition-all shadow-2xl shadow-orens/30 flex items-center justify-center gap-4 group active:scale-95">
                         Update My Account
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </button>

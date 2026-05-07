@@ -23,13 +23,21 @@
         }
     </style>
 </head>
-<body class="bg-[#F8F9FA] text-[#1A1A1A] font-sans antialiased">
-    <div class="flex min-h-screen">
+<body class="bg-[#F8F9FA] text-[#1A1A1A] font-sans antialiased overflow-x-hidden">
+    <div class="flex min-h-screen overflow-x-hidden">
+        <!-- Sidebar Overlay (Mobile Only) -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
+
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl transition-transform -translate-x-full lg:translate-x-0">
-            <div class="flex flex-col h-full bg-white">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <div class="flex flex-col h-full bg-white relative">
+                <!-- Mobile Close Button -->
+                <button id="sidebarClose" class="lg:hidden absolute top-6 right-6 p-2 text-gray-400 hover:text-orens transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+
                 <div class="p-8 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-orens rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-orens rounded-xl flex items-center justify-center shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
                     <span class="text-xl font-bold text-gray-800 tracking-tight">Orens <span class="text-orens">Pro</span></span>
@@ -102,32 +110,32 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-72 bg-gray-50 min-h-screen">
+        <main class="flex-1 lg:ml-72 bg-gray-50 min-h-screen w-full min-w-0">
             <!-- Topbar -->
-            <header class="bg-white border-b border-gray-100 sticky top-0 z-30 px-8 h-20 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <button id="sidebarToggle" class="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 px-4 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button id="sidebarToggle" class="lg:hidden p-2.5 hover:bg-gray-100 rounded-xl transition-colors group">
+                        <svg class="w-6 h-6 text-gray-600 group-hover:text-orens" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
-                    <h2 class="text-lg font-semibold text-gray-800 hidden sm:block">Overall Engagement</h2>
+                    <h2 class="text-base sm:text-lg font-bold text-gray-800 truncate max-w-[120px] xs:max-w-[200px] sm:max-w-none">{{ $title ?? 'Orens Pro' }}</h2>
                 </div>
 
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 sm:gap-4 lg:gap-6">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-bold text-gray-900 leading-tight">{{ auth()->user()->name }}</p>
-                        <p class="text-xs font-medium text-orens capitalize">{{ auth()->user()->role }}</p>
+                        <p class="text-[10px] font-bold text-orens uppercase tracking-tight">{{ auth()->user()->role }}</p>
                     </div>
-                    <form action="{{ url('/logout') }}" method="POST">
+                    <form action="{{ url('/logout') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit" class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <button type="submit" class="w-9 h-9 lg:w-11 lg:h-11 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-gray-100 lg:border-none shadow-sm lg:shadow-none">
+                            <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         </button>
                     </form>
                 </div>
             </header>
 
             <!-- Dashboard Content -->
-            <div class="p-8">
+            <div class="p-4 sm:p-6 lg:p-8 w-full">
                 @yield('content')
             </div>
         </main>
@@ -159,12 +167,37 @@
     <script>
         const sidebar = document.getElementById('sidebar');
         const toggle = document.getElementById('sidebarToggle');
+        const close = document.getElementById('sidebarClose');
+        const overlay = document.getElementById('sidebarOverlay');
         
-        if(toggle) {
-            toggle.addEventListener('click', () => {
-                sidebar.classList.toggle('-translate-x-full');
-            });
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.add('opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
         }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = '';
+        }
+
+        if(toggle) toggle.addEventListener('click', openSidebar);
+        if(close) close.addEventListener('click', closeSidebar);
+        if(overlay) overlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on resize if > lg
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                closeSidebar();
+            }
+        });
 
         function showToast(type, title, message) {
             const container = document.getElementById('toast-container');

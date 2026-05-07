@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex justify-center items-center min-h-screen p-6">
-    <div class="glass-card w-full max-w-[480px] p-10 md:p-14 animate-slide-up">
-        <div class="text-center mb-10">
-            <div class="w-20 h-20 bg-orens/10 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-110 duration-500">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-orens" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<div class="flex justify-center items-center min-h-screen p-4 sm:p-6">
+    <div class="glass-card w-full max-w-[480px] p-8 sm:p-10 md:p-14 animate-slide-up">
+        <div class="text-center mb-8 sm:mb-10">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-orens/10 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-transform hover:scale-110 duration-500">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-orens sm:w-10 sm:h-10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                 </svg>
             </div>
-            <h1 class="text-4xl font-extrabold tracking-tight text-text-primary mb-3">Welcome</h1>
-            <p class="text-text-secondary leading-relaxed">Sign in to manage your attendance with <span class="text-orens font-bold">Orens Pro</span></p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-2 sm:mb-3">Welcome</h1>
+            <p class="text-sm sm:text-base text-text-secondary leading-relaxed">Sign in to manage your attendance with <span class="text-orens font-bold">Orens Pro</span></p>
         </div>
 
         <form action="{{ url('/login') }}" method="POST" class="space-y-6">

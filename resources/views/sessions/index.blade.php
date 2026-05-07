@@ -2,19 +2,19 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 font-outfit">Attendance Sessions</h1>
-            <p class="text-gray-500">Create and manage attendance sessions for divisions.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Attendance Sessions</h1>
+            <p class="text-xs sm:text-sm text-gray-500">Create and manage attendance sessions for divisions.</p>
         </div>
-        <div class="flex gap-3">
-            <button type="button" onclick="submitMultiReport()" title="Centang sesi di tabel terlebih dahulu" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 text-sm shadow-lg shadow-indigo-200">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button type="button" onclick="submitMultiReport()" title="Centang sesi di tabel terlebih dahulu" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-indigo-200 w-full sm:w-auto">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Generate Report
+                <span>Report</span>
             </button>
-            <a href="{{ route('sessions.create') }}" class="bg-orens text-white px-6 py-3 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center gap-2 text-sm shadow-lg shadow-orens/20">
+            <a href="{{ route('sessions.create') }}" class="bg-orens text-white px-4 py-2.5 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-orens/20 w-full sm:w-auto">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Create Session
+                <span>New Session</span>
             </a>
         </div>
     </div>
@@ -36,44 +36,44 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-8 py-4 w-10 text-center">
+                        <th class="px-4 lg:px-8 py-4 w-10 text-center">
                             <input type="checkbox" onclick="toggleAll(this)" class="rounded text-orens focus:ring-orens border-gray-300">
                         </th>
-                        <th class="px-8 py-4">Title & Organisation</th>
-                        <th class="px-8 py-4">Division</th>
-                        <th class="px-8 py-4">Schedule</th>
-                        <th class="px-8 py-4">Status</th>
-                        <th class="px-8 py-4 text-right">Actions</th>
+                        <th class="px-4 lg:px-8 py-4">Title & Organisation</th>
+                        <th class="px-4 lg:px-8 py-4">Division</th>
+                        <th class="px-4 lg:px-8 py-4 text-nowrap">Schedule</th>
+                        <th class="px-4 lg:px-8 py-4">Status</th>
+                        <th class="px-4 lg:px-8 py-4 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     @forelse($sessions as $s)
                         <tr class="hover:bg-gray-25 transition-all">
-                            <td class="px-8 py-5 text-center">
+                            <td class="px-4 lg:px-8 py-5 text-center">
                                 <input type="checkbox" value="{{ $s->id }}" class="rounded text-orens focus:ring-orens border-gray-300 session-checkbox">
                             </td>
-                            <td class="px-8 py-5">
-                                <span class="font-bold text-gray-700 block">{{ $s->title }}</span>
+                            <td class="px-4 lg:px-8 py-5">
+                                <span class="font-bold text-gray-700 block text-sm sm:text-base">{{ $s->title }}</span>
                                 <span class="text-xs text-gray-400 font-medium">{{ $s->organisation->name ?? 'Global' }}</span>
                             </td>
-                            <td class="px-8 py-5">
-                                <span class="px-3 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase rounded-full">
+                            <td class="px-4 lg:px-8 py-5">
+                                <span class="px-3 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase rounded-full border border-gray-100">
                                     {{ $s->division->name ?? 'Global' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-5">
-                                <span class="text-sm font-bold text-gray-600 block">{{ \Carbon\Carbon::parse($s->session_date)->format('d M Y') }}</span>
-                                <span class="text-xs text-gray-400">{{ $s->start_time }} - {{ $s->end_time }}</span>
+                            <td class="px-4 lg:px-8 py-5">
+                                <span class="text-sm font-bold text-gray-600 block text-nowrap">{{ \Carbon\Carbon::parse($s->session_date)->format('d M Y') }}</span>
+                                <span class="text-xs text-gray-400 text-nowrap">{{ $s->start_time }} - {{ $s->end_time }}</span>
                             </td>
-                            <td class="px-8 py-5">
+                            <td class="px-4 lg:px-8 py-5">
                                 @if($s->is_active)
-                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-full">Active</span>
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-full border border-green-100">Active</span>
                                 @else
-                                    <span class="px-3 py-1 bg-red-50 text-red-600 text-[10px] font-bold uppercase rounded-full">Inactive</span>
+                                    <span class="px-3 py-1 bg-red-50 text-red-600 text-[10px] font-bold uppercase rounded-full border border-red-100">Inactive</span>
                                 @endif
                             </td>
-                            <td class="px-8 py-5 text-right">
-                                    <div class="flex items-center gap-2 justify-end">
+                            <td class="px-4 lg:px-8 py-5 text-right">
+                                    <div class="flex items-center gap-1 sm:gap-2 justify-end">
                                         <button type="button" onclick="showQR('{{ $s->qr_token }}', '{{ $s->title }}')" class="p-2 text-gray-400 hover:text-green-500 transition-colors" title="Show QR Code">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                         </button>

@@ -3,29 +3,29 @@
 @section('content')
 <div class="space-y-8 animate-fade-in">
     <!-- Header with Identity -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-4xl font-black text-text-primary font-outfit tracking-tighter">Portal Overview</h1>
-            <div class="flex items-center gap-3 mt-2">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-text-primary font-outfit tracking-tighter">Portal Overview</h1>
+            <div class="flex flex-wrap items-center gap-2 mt-2">
                 <div class="flex items-center gap-1.5 px-2.5 py-1 bg-orens/10 rounded-full border border-orens/20">
                     <span class="w-2 h-2 rounded-full bg-orens animate-pulse"></span>
-                    <p class="text-[10px] font-bold text-orens uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-orens uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
                 </div>
                 @if(auth()->user()->role === 'leader' && isset($division))
                     <div class="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full border border-gray-200">
-                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $division->name }} Division</p>
+                        <p class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $division->name }} Division</p>
                     </div>
                 @endif
             </div>
         </div>
-        <div class="flex flex-col items-end gap-2">
-            <div class="glass-card px-4 py-2 text-[10px] font-bold text-gray-500 flex items-center gap-2 border-none bg-white shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                System Live: {{ now()->format('d M Y') }}
+        <div class="flex flex-row sm:flex-col items-center sm:items-end gap-2">
+            <div class="glass-card px-3 py-1.5 sm:px-4 sm:py-2 text-[9px] sm:text-[10px] font-bold text-gray-500 flex items-center gap-2 border-none bg-white shadow-sm">
+                <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500"></span>
+                <span class="hidden xs:inline">System Live:</span> {{ now()->format('d M Y') }}
             </div>
-            <div class="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-[9px] font-black uppercase tracking-tighter">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                PDPA Compliant & Audited
+            <div class="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span class="truncate">PDPA Compliant</span>
             </div>
         </div>
     </div>
@@ -153,30 +153,30 @@
         </div>
 
         <!-- Participation & Stats -->
-        <div class="flex flex-col gap-8">
-            <div class="bg-orens rounded-[32px] p-8 flex flex-col justify-between text-white shadow-xl shadow-orens/20 relative overflow-hidden group h-1/2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-8">
+            <div class="bg-orens rounded-[32px] p-5 sm:p-8 flex flex-col justify-between text-white shadow-xl shadow-orens/20 relative overflow-hidden group min-h-[180px] sm:min-h-[200px]">
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
-                <div>
+                <div class="relative z-10">
                     <p class="font-bold uppercase tracking-widest text-[10px] mb-2 opacity-80">Total Partisipasi</p>
-                    <h4 class="text-7xl font-black font-outfit mb-4">{{ $total_join ?? 0 }}</h4>
+                    <h4 class="text-5xl sm:text-7xl font-black font-outfit mb-4">{{ $total_join ?? 0 }}</h4>
                 </div>
-                <div>
-                    <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-orens rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg">
+                <div class="relative z-10">
+                    <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-orens rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg w-full sm:w-auto justify-center">
                         Lihat Riwayat
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </a>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex flex-col justify-between h-1/2">
+            <div class="bg-white rounded-[32px] p-5 sm:p-8 border border-gray-100 shadow-sm flex flex-col justify-between min-h-[180px] sm:min-h-[200px]">
                 <div>
                     <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Attendance Rate</p>
-                    <h4 class="text-5xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</h4>
+                    <h4 class="text-4xl sm:text-5xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</h4>
                 </div>
-                <p class="text-xs font-medium text-gray-400 mt-4 leading-relaxed italic">
+                <p class="text-[11px] sm:text-xs font-medium text-gray-400 mt-4 leading-relaxed italic">
                     "Kedisiplinan adalah jembatan antara cita-cita dan pencapaian."
                 </p>
             </div>
@@ -196,9 +196,9 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-8 py-4">{{ auth()->user()->role === 'member' ? 'Session' : 'User/Session' }}</th>
-                        <th class="px-8 py-4">Date</th>
-                        <th class="px-8 py-4">Status</th>
+                        <th class="px-4 lg:px-8 py-4">{{ auth()->user()->role === 'member' ? 'Session' : 'User/Session' }}</th>
+                        <th class="px-4 lg:px-8 py-4">Date</th>
+                        <th class="px-4 lg:px-8 py-4">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -211,22 +211,22 @@
                             $status = $isAttendance ? ($item->status) : ($item->is_active ? 'active' : 'inactive');
                         @endphp
                         <tr class="hover:bg-gray-25 transition-all">
-                            <td class="px-8 py-4">
+                            <td class="px-4 lg:px-8 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 shrink-0">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-800">{{ $title }}</span>
-                                        <span class="text-[10px] text-gray-400 font-medium">{{ $subtext }}</span>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-sm font-bold text-gray-800 truncate">{{ $title }}</span>
+                                        <span class="text-[10px] text-gray-400 font-medium truncate">{{ $subtext }}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-8 py-5">
-                                <span class="text-sm font-bold text-gray-600 block">{{ $date }}</span>
+                            <td class="px-4 lg:px-8 py-5">
+                                <span class="text-sm font-bold text-gray-600 block text-nowrap">{{ $date }}</span>
                             </td>
-                            <td class="px-8 py-5">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase
+                            <td class="px-4 lg:px-8 py-5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase border border-current/10
                                     {{ in_array($status, ['hadir', 'completed', 'active']) ? 'bg-green-50 text-green-600' : '' }}
                                     {{ $status === 'sakit' ? 'bg-blue-50 text-blue-600' : '' }}
                                     {{ $status === 'izin' ? 'bg-yellow-50 text-yellow-600' : '' }}
