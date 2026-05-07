@@ -21,7 +21,7 @@
 
     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left min-w-[500px] lg:min-w-full">
+            <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
                         <th class="px-4 lg:px-8 py-4">Name</th>

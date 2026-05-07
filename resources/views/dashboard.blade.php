@@ -187,8 +187,8 @@
 
     <!-- Table Section -->
     <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-        <div class="p-8 border-b border-gray-50 flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-800">
+        <div class="p-6 sm:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-800">
                 {{ auth()->user()->role === 'member' ? 'My Recent Attendance' : 'Recent Activity' }}
             </h3>
         </div>

@@ -2,17 +2,17 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Laporan Kehadiran Kumulatif</h1>
-            <p class="text-gray-600">Berdasarkan {{ $sessions->count() }} sesi yang dipilih</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Laporan Kumulatif</h1>
+            <p class="text-xs sm:text-sm text-gray-600">Berdasarkan {{ $sessions->count() }} sesi terpilih</p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="window.print()" class="btn-premium px-6 py-2 flex items-center gap-2">
+        <div class="flex w-full sm:w-auto">
+            <button onclick="window.print()" class="bg-orens text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-orens/20 w-full sm:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
                 </svg>
-                Cetak PDF
+                <span>Cetak PDF</span>
             </button>
         </div>
     </div>
