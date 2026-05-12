@@ -137,6 +137,35 @@
     </div>
 </div>
 
+<!-- Alert Modal (Selection Warning) -->
+<div id="selectionModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-gray-900/40 backdrop-blur-[2px] animate-fade-in">
+    <div class="bg-white rounded-[40px] shadow-2xl max-w-sm w-full p-8 text-center animate-slide-up relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-50 rounded-full blur-3xl opacity-50"></div>
+        
+        <div class="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        
+        <h3 class="text-2xl font-black text-gray-800 font-outfit mb-2">Pilih Sesi!</h3>
+        <p class="text-sm text-gray-500 font-medium mb-8 leading-relaxed">
+            Silakan pilih minimal satu sesi dari tabel sebelum membuat laporan kumulatif.
+        </p>
+        
+        <button onclick="hideSelectionModal()" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95">
+            Mengerti
+        </button>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+</style>
+
 <script>
     function toggleAll(source) {
         const checkboxes = document.getElementsByClassName('session-checkbox');
@@ -148,7 +177,7 @@
     function submitMultiReport() {
         const checkboxes = document.querySelectorAll('.session-checkbox:checked');
         if (checkboxes.length === 0) {
-            alert('Silakan pilih minimal satu sesi.');
+            showSelectionModal();
             return;
         }
 
@@ -204,6 +233,18 @@
         modal.classList.remove('flex');
         clearInterval(qrRefreshInterval);
         currentSessionId = null;
+    }
+
+    function showSelectionModal() {
+        const modal = document.getElementById('selectionModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function hideSelectionModal() {
+        const modal = document.getElementById('selectionModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 </script>
 @endsection
