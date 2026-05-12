@@ -11,10 +11,14 @@ use Illuminate\Http\Request;
 class AttendanceController extends Controller
 {
     protected $attendanceService;
+    protected $auditService;
 
-    public function __construct(\App\Services\AttendanceService $attendanceService)
-    {
+    public function __construct(
+        \App\Services\AttendanceService $attendanceService,
+        \App\Services\AuditService $auditService
+    ) {
         $this->attendanceService = $attendanceService;
+        $this->auditService = $auditService;
     }
 
     public function markingSheet(Request $request, AttendanceSession $session)
@@ -153,71 +157,13 @@ class AttendanceController extends Controller
 
         $organisationId = $sessions->first()->organisation_id;
         
-        // Determine unique divisions involved in these sessions
-        $sessionDivisionIds = $sessions->pluck('division_id')->unique();
-        $hasGlobalSession = $sessionDivisionIds->contains(null);
+        // Log the event for Audit Trail
+        $this->auditService->log('generate_multi_report', null, null, [
+            'session_ids' => $sessionIds,
+            'organisation_id' => $organisationId
+        ]);
 
-        // Get members who are eligible for at least one of these sessions
-        $membersQuery = User::where('organisation_id', $organisationId)
-            ->where('role', 'member');
-            
-        if (!$hasGlobalSession) {
-            $membersQuery->whereIn('division_id', $sessionDivisionIds);
-        }
-
-        $members = $membersQuery->with('division')->get();
-
-        $attendances = Attendance::whereIn('session_id', $sessionIds)->get();
-        
-        $reportData = [];
-        foreach ($members as $member) {
-            // For each member, only count sessions they were supposed to attend
-            $eligibleSessions = $sessions->filter(function($s) use ($member) {
-                return is_null($s->division_id) || $s->division_id == $member->division_id;
-            });
-            
-            $eligibleCount = $eligibleSessions->count();
-            if ($eligibleCount === 0) continue;
-
-            $memberAttendances = $attendances->where('user_id', $member->id);
-            $presentCount = $memberAttendances->where('status', 'hadir')->count();
-            
-            $reportData[$member->id] = [
-                'name' => $member->name,
-                'division' => $member->division->name ?? 'N/A',
-                'present' => $presentCount,
-                'total' => $eligibleCount,
-                'percentage' => $eligibleCount > 0 ? round(($presentCount / $eligibleCount) * 100, 2) : 0
-            ];
-        }
-
-        // Division stats
-        $divisionStats = [];
-        $divisionsQuery = \App\Models\Division::where('organisation_id', $organisationId);
-        if (!$hasGlobalSession) {
-            $divisionsQuery->whereIn('id', $sessionDivisionIds);
-        }
-        $divisions = $divisionsQuery->get();
-        
-        foreach ($divisions as $division) {
-            $divisionMembers = $members->where('division_id', $division->id);
-            if ($divisionMembers->isEmpty()) continue;
-
-            $divisionSessionsCount = $sessions->filter(function($s) use ($division) {
-                return is_null($s->division_id) || $s->division_id == $division->id;
-            })->count();
-
-            $totalPossible = $divisionMembers->count() * $divisionSessionsCount;
-            $totalPresent = $attendances->whereIn('user_id', $divisionMembers->pluck('id'))->where('status', 'hadir')->count();
-            
-            if ($totalPossible > 0) {
-                $divisionStats[$division->name] = [
-                    'present' => $totalPresent,
-                    'total' => $totalPossible,
-                    'percentage' => round(($totalPresent / $totalPossible) * 100, 2)
-                ];
-            }
-        }
+        [$reportData, $divisionStats] = $this->attendanceService->generateMultiReportData($sessions, $organisationId);
 
         return view('sessions.multi_report', compact('sessions', 'reportData', 'divisionStats'));
     }

@@ -100,6 +100,68 @@ class AttendanceService
         ];
     }
 
+    /**
+     * Generate cumulative report data for multiple sessions.
+     * International Standard: Optimized with Caching and High-Speed Processing.
+     */
+    public function generateMultiReportData($sessions, int $organisationId): array
+    {
+        $sessionIds = $sessions->pluck('id')->sort()->values()->toArray();
+        $cacheKey = 'report_' . md5(implode('_', $sessionIds));
+
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function() use ($sessions, $organisationId, $sessionIds) {
+            $sessionDivisionIds = $sessions->pluck('division_id')->unique();
+            $hasGlobalSession = $sessionDivisionIds->contains(null);
+
+            $membersQuery = User::where('organisation_id', $organisationId)->where('role', 'member');
+            if (!$hasGlobalSession) {
+                $membersQuery->whereIn('division_id', $sessionDivisionIds);
+            }
+
+            $members = $membersQuery->with('division')->get();
+            $attendances = Attendance::whereIn('session_id', $sessionIds)->get();
+            
+            $reportData = [];
+            foreach ($members as $member) {
+                $eligibleSessions = $sessions->filter(fn($s) => is_null($s->division_id) || $s->division_id == $member->division_id);
+                $eligibleCount = $eligibleSessions->count();
+                if ($eligibleCount === 0) continue;
+
+                $presentCount = $attendances->where('user_id', $member->id)->where('status', 'hadir')->count();
+                $reportData[$member->id] = [
+                    'name' => $member->name,
+                    'division' => $member->division->name ?? 'N/A',
+                    'present' => $presentCount,
+                    'total' => $eligibleCount,
+                    'percentage' => $eligibleCount > 0 ? round(($presentCount / $eligibleCount) * 100, 2) : 0
+                ];
+            }
+
+            $divisionStats = [];
+            $divisionsQuery = \App\Models\Division::where('organisation_id', $organisationId);
+            if (!$hasGlobalSession) $divisionsQuery->whereIn('id', $sessionDivisionIds);
+            $divisions = $divisionsQuery->get();
+            
+            foreach ($divisions as $division) {
+                $divisionMembers = $members->where('division_id', $division->id);
+                if ($divisionMembers->isEmpty()) continue;
+
+                $divSessionCount = $sessions->filter(fn($s) => is_null($s->division_id) || $s->division_id == $division->id)->count();
+                $totalPossible = $divisionMembers->count() * $divSessionCount;
+                $totalPresent = $attendances->whereIn('user_id', $divisionMembers->pluck('id'))->where('status', 'hadir')->count();
+                
+                if ($totalPossible > 0) {
+                    $divisionStats[$division->name] = [
+                        'present' => $totalPresent, 'total' => $totalPossible,
+                        'percentage' => round(($totalPresent / $totalPossible) * 100, 2)
+                    ];
+                }
+            }
+
+            return [$reportData, $divisionStats];
+        });
+    }
+
     private function logAndFail(User $user, AttendanceSession $session, array $data, string $message): array
     {
         AttendanceLog::create([
