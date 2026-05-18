@@ -8,25 +8,37 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Implementing International Performance Standards (Indexing for Scalability).
      */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->index(['organisation_id', 'division_id', 'role']);
+            $table->index(
+                ['organisation_id', 'division_id', 'role'],
+                'users_org_div_role_idx'
+            );
         });
 
         Schema::table('attendance_sessions', function (Blueprint $table) {
-            $table->index(['organisation_id', 'division_id', 'session_date']);
-            $table->index('is_active');
+            $table->index(
+                ['organisation_id', 'division_id', 'session_date'],
+                'att_sess_org_div_date_idx'
+            );
+
+            $table->index('is_active', 'att_sess_active_idx');
         });
 
         Schema::table('attendances', function (Blueprint $table) {
-            $table->index(['session_id', 'user_id', 'status']);
+            $table->index(
+                ['session_id', 'user_id', 'status'],
+                'att_session_user_status_idx'
+            );
         });
 
         Schema::table('attendance_logs', function (Blueprint $table) {
-            $table->index(['user_id', 'qr_token']);
+            $table->index(
+                ['user_id', 'qr_token'],
+                'att_logs_user_qr_idx'
+            );
         });
     }
 
@@ -36,20 +48,20 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex(['organisation_id', 'division_id', 'role']);
+            $table->dropIndex('users_org_div_role_idx');
         });
 
         Schema::table('attendance_sessions', function (Blueprint $table) {
-            $table->dropIndex(['organisation_id', 'division_id', 'session_date']);
-            $table->dropIndex(['is_active']);
+            $table->dropIndex('att_sess_org_div_date_idx');
+            $table->dropIndex('att_sess_active_idx');
         });
 
         Schema::table('attendances', function (Blueprint $table) {
-            $table->dropIndex(['session_id', 'user_id', 'status']);
+            $table->dropIndex('att_session_user_status_idx');
         });
 
         Schema::table('attendance_logs', function (Blueprint $table) {
-            $table->dropIndex(['user_id', 'qr_token']);
+            $table->dropIndex('att_logs_user_qr_idx');
         });
     }
 };
