@@ -107,7 +107,17 @@ class AttendanceService
     public function generateMultiReportData($sessions, int $organisationId): array
     {
         $sessionIds = $sessions->pluck('id')->sort()->values()->toArray();
-        $cacheKey = 'report_' . md5(implode('_', $sessionIds));
+        
+        $lastAttendanceUpdate = Attendance::whereIn('session_id', $sessionIds)->max('updated_at') ?? 'never';
+        $lastUserUpdate = User::where('organisation_id', $organisationId)->max('updated_at') ?? 'never';
+        $lastSessionUpdate = AttendanceSession::whereIn('id', $sessionIds)->max('updated_at') ?? 'never';
+
+        $cacheKey = 'report_' . md5(
+            implode('_', $sessionIds) . '_' . 
+            $lastAttendanceUpdate . '_' . 
+            $lastUserUpdate . '_' . 
+            $lastSessionUpdate
+        );
 
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function() use ($sessions, $organisationId, $sessionIds) {
             $sessionDivisionIds = $sessions->pluck('division_id')->unique();
