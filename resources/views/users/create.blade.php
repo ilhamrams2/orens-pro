@@ -43,14 +43,14 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-6">
-                    @if(auth()->user()->role === 'admin')
+                    @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Role</label>
                         <select name="role" required
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all">
                             <option value="member" {{ old('role', $user->role ?? '') === 'member' ? 'selected' : '' }}>Member</option>
-                            <option value="leader" {{ old('role', $user->role ?? '') === 'leader' ? 'selected' : '' }}>Pengurus</option>
-                            <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Pembina</option>
+                            <option value="pengurus" {{ old('role', $user->role ?? '') === 'pengurus' ? 'selected' : '' }}>Pengurus</option>
+                            <option value="pembina" {{ old('role', $user->role ?? '') === 'pembina' ? 'selected' : '' }}>Pembina</option>
                         </select>
                         @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -79,7 +79,7 @@
                     @endif
                 </div>
 
-                @if(auth()->user()->role === 'admin')
+                @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Division (Optional)</label>
                     <select name="division_id"

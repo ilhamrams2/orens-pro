@@ -78,7 +78,7 @@
                                         <a href="{{ route('sessions.mark', $s) }}" class="p-2 text-gray-400 hover:text-blue-500 transition-colors" title="Mark Attendance">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </a>
-                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'leader')
+                                        @if(auth()->user()->role === 'pembina' || auth()->user()->role === 'pengurus')
                                         <a href="{{ route('sessions.logs', $s) }}" class="p-2 text-gray-400 hover:text-indigo-500 transition-colors" title="View Attempt Logs">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                         </a>

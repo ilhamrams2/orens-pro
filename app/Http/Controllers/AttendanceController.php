@@ -29,7 +29,7 @@ class AttendanceController extends Controller
         if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
             abort(403);
         }
-        if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
+        if ($user->role === 'pengurus' && $session->division_id !== $user->division_id) {
             abort(403);
         }
 
@@ -53,11 +53,11 @@ class AttendanceController extends Controller
     {
         $user = $request->user();
         // Only Superadmin or Admin (Pembina) can see reports
-        if ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        if ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
         // Admin must be from the same organisation
-        if ($user->role === 'admin' && $session->organisation_id !== $user->organisation_id) {
+        if ($user->role === 'pembina' && $session->organisation_id !== $user->organisation_id) {
             abort(403);
         }
 
@@ -98,7 +98,7 @@ class AttendanceController extends Controller
         if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
             abort(403);
         }
-        if ($user->role === 'leader' && $session->division_id !== $user->division_id) {
+        if ($user->role === 'pengurus' && $session->division_id !== $user->division_id) {
             abort(403);
         }
 

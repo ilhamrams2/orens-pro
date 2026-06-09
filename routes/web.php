@@ -25,10 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::middleware(['auth', 'role:admin,leader'])->group(function () {
+Route::middleware(['auth', 'role:pembina,pengurus'])->group(function () {
     Route::get('users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
     Route::get('users/export/pdf', [UserController::class, 'exportPdf'])->name('users.export.pdf');
     Route::post('users/reset-grades', [UserController::class, 'resetGrades'])->name('users.reset-grades');
+    Route::post('users/import', [UserController::class, 'importCsv'])->name('users.import');
     Route::resource('/admin/users', UserController::class);
     Route::resource('/sessions', AttendanceSessionController::class);
     Route::get('/sessions/{session}/qr', [AttendanceSessionController::class, 'getQr'])->name('sessions.qr');
@@ -47,7 +48,7 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/sessions/{session}/checkin', [AttendanceController::class, 'selfCheckIn'])->name('sessions.checkin');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:pembina'])->group(function () {
     Route::resource('/admin/organisations', OrganisationController::class);
     Route::resource('/admin/divisions', DivisionController::class);
 });

@@ -13,7 +13,7 @@ class DivisionController extends Controller
         $user = $request->user();
         $query = Division::with('organisation');
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             $query->where('organisation_id', $user->organisation_id);
         } elseif ($user->role !== 'superadmin') {
             abort(403);
@@ -26,7 +26,7 @@ class DivisionController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             $organisations = Organisation::where('id', $user->organisation_id)->get();
         } elseif ($user->role === 'superadmin') {
             $organisations = Organisation::all();
@@ -39,9 +39,9 @@ class DivisionController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        if ($user->role === 'admin' && (int)$request->organisation_id !== $user->organisation_id) {
+        if ($user->role === 'pembina' && (int)$request->organisation_id !== $user->organisation_id) {
             abort(403);
-        } elseif ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        } elseif ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
 
@@ -58,13 +58,13 @@ class DivisionController extends Controller
     public function edit(Request $request, Division $division)
     {
         $user = $request->user();
-        if ($user->role === 'admin' && $division->organisation_id !== $user->organisation_id) {
+        if ($user->role === 'pembina' && $division->organisation_id !== $user->organisation_id) {
             abort(403);
-        } elseif ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        } elseif ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             $organisations = Organisation::where('id', $user->organisation_id)->get();
         } else {
             $organisations = Organisation::all();
@@ -75,9 +75,9 @@ class DivisionController extends Controller
     public function update(Request $request, Division $division)
     {
         $user = $request->user();
-        if ($user->role === 'admin' && ($division->organisation_id !== $user->organisation_id || (int)$request->organisation_id !== $user->organisation_id)) {
+        if ($user->role === 'pembina' && ($division->organisation_id !== $user->organisation_id || (int)$request->organisation_id !== $user->organisation_id)) {
             abort(403);
-        } elseif ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        } elseif ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
 
@@ -94,9 +94,9 @@ class DivisionController extends Controller
     public function destroy(Request $request, Division $division)
     {
         $user = $request->user();
-        if ($user->role === 'admin' && $division->organisation_id !== $user->organisation_id) {
+        if ($user->role === 'pembina' && $division->organisation_id !== $user->organisation_id) {
             abort(403);
-        } elseif ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        } elseif ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
 

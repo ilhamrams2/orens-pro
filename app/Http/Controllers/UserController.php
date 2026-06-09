@@ -24,7 +24,7 @@ class UserController extends Controller
                 }
             }]);
 
-        if ($user->role === 'admin' || $user->role === 'leader') {
+        if ($user->role === 'pembina' || $user->role === 'pengurus') {
             $query->where('organisation_id', $user->organisation_id);
         } elseif ($user->role !== 'superadmin') {
             abort(403);
@@ -54,7 +54,7 @@ class UserController extends Controller
     public function exportExcel(Request $request)
     {
         $user = $request->user();
-        $orgId = (in_array($user->role, ['admin', 'leader'])) ? $user->organisation_id : null;
+        $orgId = (in_array($user->role, ['pembina', 'pengurus'])) ? $user->organisation_id : null;
         
         return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\MembersExport($orgId), 'members_export_' . now()->format('Y-m-d') . '.xlsx');
     }
@@ -68,7 +68,7 @@ class UserController extends Controller
             }])
             ->where('role', 'member');
 
-        if (in_array($user->role, ['admin', 'leader'])) {
+        if (in_array($user->role, ['pembina', 'pengurus'])) {
             $query->where('organisation_id', $user->organisation_id);
         }
 
@@ -96,7 +96,7 @@ class UserController extends Controller
     public function resetGrades(Request $request)
     {
         $user = $request->user();
-        if ($user->role !== 'admin' && $user->role !== 'superadmin') {
+        if ($user->role !== 'pembina' && $user->role !== 'superadmin') {
             abort(403);
         }
 
@@ -115,7 +115,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             $organisations = Organisation::where('id', $user->organisation_id)->get();
             $divisions = Division::where('organisation_id', $user->organisation_id)->get();
         } elseif ($user->role === 'superadmin') {
@@ -130,7 +130,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        if ($user->role !== 'superadmin' && $user->role !== 'admin') {
+        if ($user->role !== 'superadmin' && $user->role !== 'pembina') {
             abort(403);
         }
         $rules = [
@@ -148,12 +148,12 @@ class UserController extends Controller
             'password' => 'required|min:8',
         ];
 
-        if ($user->role === 'admin') {
-            $rules['role'] = 'required|in:leader,member';
+        if ($user->role === 'pembina') {
+            $rules['role'] = 'required|in:pengurus,member';
             $rules['organisation_id'] = 'required|in:'.$user->organisation_id;
             $rules['division_id'] = 'nullable|exists:divisions,id';
         } elseif ($user->role === 'superadmin') {
-            $rules['role'] = 'required|in:admin,leader,member';
+            $rules['role'] = 'required|in:pembina,pengurus,member';
             $rules['organisation_id'] = 'required|exists:organisations,id';
             $rules['division_id'] = 'nullable|exists:divisions,id';
         }
@@ -166,7 +166,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ];
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             $data['role'] = $request->role;
             $data['organisation_id'] = $user->organisation_id;
             $data['division_id'] = $request->division_id;
@@ -184,13 +184,13 @@ class UserController extends Controller
     public function edit(Request $request, User $user)
     {
         $authUser = $request->user();
-        if ($authUser->role === 'admin' && $user->organisation_id !== $authUser->organisation_id) {
+        if ($authUser->role === 'pembina' && $user->organisation_id !== $authUser->organisation_id) {
             abort(403);
-        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'admin') {
+        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
             abort(403);
         }
 
-        if ($authUser->role === 'admin') {
+        if ($authUser->role === 'pembina') {
             $organisations = Organisation::where('id', $authUser->organisation_id)->get();
             $divisions = Division::where('organisation_id', $authUser->organisation_id)->get();
         } else {
@@ -203,9 +203,9 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $authUser = $request->user();
-        if ($authUser->role === 'admin' && ($user->organisation_id !== $authUser->organisation_id || (int)$request->organisation_id !== $authUser->organisation_id)) {
+        if ($authUser->role === 'pembina' && ($user->organisation_id !== $authUser->organisation_id || (int)$request->organisation_id !== $authUser->organisation_id)) {
             abort(403);
-        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'admin') {
+        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
             abort(403);
         }
 
@@ -224,12 +224,12 @@ class UserController extends Controller
             'password' => 'nullable|min:8',
         ];
 
-        if ($authUser->role === 'admin') {
-            $rules['role'] = 'required|in:leader,member';
+        if ($authUser->role === 'pembina') {
+            $rules['role'] = 'required|in:pengurus,member';
             $rules['organisation_id'] = 'required|in:'.$authUser->organisation_id;
             $rules['division_id'] = 'nullable|exists:divisions,id';
         } elseif ($authUser->role === 'superadmin') {
-            $rules['role'] = 'required|in:admin,leader,member';
+            $rules['role'] = 'required|in:pembina,pengurus,member';
             $rules['organisation_id'] = 'required|exists:organisations,id';
             $rules['division_id'] = 'nullable|exists:divisions,id';
         }
@@ -241,7 +241,7 @@ class UserController extends Controller
             'email' => $request->email,
         ];
 
-        if ($authUser->role === 'admin') {
+        if ($authUser->role === 'pembina') {
             $data['role'] = $request->role;
             $data['organisation_id'] = $authUser->organisation_id;
             $data['division_id'] = $request->division_id;
@@ -263,9 +263,9 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         $authUser = $request->user();
-        if ($authUser->role === 'admin' && $user->organisation_id !== $authUser->organisation_id) {
+        if ($authUser->role === 'pembina' && $user->organisation_id !== $authUser->organisation_id) {
             abort(403);
-        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'admin') {
+        } elseif ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
             abort(403);
         }
 
@@ -275,5 +275,173 @@ class UserController extends Controller
 
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function importCsv(Request $request)
+    {
+        $authUser = $request->user();
+        if ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
+            abort(403);
+        }
+
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('csv_file');
+        $filePath = $file->getRealPath();
+
+        $handle = fopen($filePath, 'r');
+        if (!$handle) {
+            return back()->with('error', 'Gagal membuka file CSV.');
+        }
+
+        // Auto-detect delimiter
+        $firstLine = fgets($handle);
+        rewind($handle);
+        $delimiter = ',';
+        if ($firstLine !== false) {
+            $semiCount = substr_count($firstLine, ';');
+            $commaCount = substr_count($firstLine, ',');
+            if ($semiCount > $commaCount) {
+                $delimiter = ';';
+            }
+        }
+
+        // Read header
+        $header = fgetcsv($handle, 1000, $delimiter);
+        if (!$header) {
+            fclose($handle);
+            return back()->with('error', 'File CSV kosong.');
+        }
+
+        // Clean headers (remove BOM or spaces)
+        $header = array_map(function($h) {
+            return trim(strtolower(preg_replace('/[\x{FEFF}\x{FFFE}]/u', '', $h)));
+        }, $header);
+
+        // Required headers: nama, email, password
+        $required = ['nama', 'email', 'password'];
+        foreach ($required as $req) {
+            if (!in_array($req, $header)) {
+                fclose($handle);
+                return back()->with('error', "Format CSV salah. Kolom wajib yang harus ada di baris pertama: " . implode(', ', $required) . ". Pembatas terdeteksi: '" . $delimiter . "'");
+            }
+        }
+
+        $rowNum = 1;
+        $successCount = 0;
+        $errors = [];
+
+        // DB Transaction for safety
+        \Illuminate\Support\Facades\DB::beginTransaction();
+
+        try {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                $rowNum++;
+                // Skip empty lines
+                if (count($row) === 1 && empty($row[0])) {
+                    continue;
+                }
+
+                if (count($row) !== count($header)) {
+                    $errors[] = "Baris $rowNum: Jumlah kolom (" . count($row) . ") tidak sesuai dengan header (" . count($header) . ").";
+                    continue;
+                }
+
+                $data = array_combine($header, $row);
+                if (!$data) {
+                    $errors[] = "Baris $rowNum: Gagal memproses data baris.";
+                    continue;
+                }
+
+                $name = trim($data['nama'] ?? '');
+                $email = trim($data['email'] ?? '');
+                $password = trim($data['password'] ?? '');
+                $phone = trim($data['telepon'] ?? '');
+                $divName = trim($data['divisi'] ?? '');
+                $orgName = trim($data['organisasi'] ?? '');
+
+                // Validation
+                if (empty($name) || empty($email) || empty($password)) {
+                    $errors[] = "Baris $rowNum: Nama, Email, dan Password wajib diisi.";
+                    continue;
+                }
+
+                // Domain check
+                $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
+                $emailDomain = substr(strrchr($email, "@"), 1);
+                if (!in_array($emailDomain, $allowedDomains)) {
+                    $errors[] = "Baris $rowNum: Domain email $email tidak diizinkan. Harus menggunakan domain sekolah (@smkprestasiprima.sch.id atau @smaprestasiprima.sch.id).";
+                    continue;
+                }
+
+                // Email uniqueness
+                if (User::where('email', $email)->exists()) {
+                    $errors[] = "Baris $rowNum: Email $email sudah digunakan.";
+                    continue;
+                }
+
+                // Resolve Organisation ID
+                $orgId = null;
+                if ($authUser->role === 'superadmin') {
+                    if (empty($orgName)) {
+                        $errors[] = "Baris $rowNum: Kolom organisasi wajib diisi untuk Superadmin.";
+                        continue;
+                    }
+                    $organisation = Organisation::where('name', $orgName)->first();
+                    if (!$organisation) {
+                        $errors[] = "Baris $rowNum: Organisasi '$orgName' tidak ditemukan.";
+                        continue;
+                    }
+                    $orgId = $organisation->id;
+                } else {
+                    $orgId = $authUser->organisation_id;
+                }
+
+                // Resolve Division ID (Optional)
+                $divisionId = null;
+                if (!empty($divName)) {
+                    $division = Division::where('organisation_id', $orgId)
+                        ->where('name', $divName)
+                        ->first();
+                    if (!$division) {
+                        $errors[] = "Baris $rowNum: Divisi '$divName' tidak ditemukan di organisasi terkait.";
+                        continue;
+                    }
+                    $divisionId = $division->id;
+                }
+
+                // Create User
+                User::create([
+                    'organisation_id' => $orgId,
+                    'division_id' => $divisionId,
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => \Illuminate\Support\Facades\Hash::make($password),
+                    'phone' => $phone,
+                    'role' => 'member',
+                    'is_active' => true,
+                ]);
+
+                $successCount++;
+            }
+
+            if (!empty($errors)) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                fclose($handle);
+                return back()->with('error', 'Gagal mengimpor CSV. Detail error:<br>' . implode('<br>', array_slice($errors, 0, 5)) . (count($errors) > 5 ? '<br>...dan ' . (count($errors) - 5) . ' error lainnya.' : ''));
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+            fclose($handle);
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            fclose($handle);
+            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
+
+        return back()->with('success', "Berhasil mengimpor $successCount member.");
     }
 }

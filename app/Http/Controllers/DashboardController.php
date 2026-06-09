@@ -16,10 +16,10 @@ class DashboardController extends Controller
         
         if ($user->role === 'superadmin') {
             return $this->superadminStats();
-        } elseif ($user->role === 'admin') {
-            return $this->adminStats($user);
-        } elseif ($user->role === 'leader') {
-            return $this->leaderStats($user);
+        } elseif ($user->role === 'pembina') {
+            return $this->pembinaStats($user);
+        } elseif ($user->role === 'pengurus') {
+            return $this->pengurusStats($user);
         } else {
             return $this->memberStats($user);
         }
@@ -77,7 +77,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function adminStats($user)
+    private function pembinaStats($user)
     {
         $nowTime = now()->format('H:i:s');
         $today = now()->toDateString();
@@ -137,7 +137,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function leaderStats($user)
+    private function pengurusStats($user)
     {
         $division = $user->division;
         if (!$division) return abort(403, 'Anda tidak memiliki divisi.');

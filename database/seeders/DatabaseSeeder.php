@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Pembina Orens Solution',
             'email' => 'pembina1@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
-            'role' => 'admin',
+            'role' => 'pembina',
         ]);
 
         $pengurusGame = User::create([
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Pengurus Game',
             'email' => 'game@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
-            'role' => 'leader',
+            'role' => 'pengurus',
         ]);
 
         // Loop for 3 members per division in Org 1
@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Pembina Orens Network',
             'email' => 'pembina2@smkprestasiprima.sch.id',
             'password' => Hash::make('password'),
-            'role' => 'admin',
+            'role' => 'pembina',
         ]);
 
         $pengurusServer = User::create([
@@ -97,7 +97,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Pengurus Server',
             'email' => 'server@smaprestasiprima.sch.id',
             'password' => Hash::make('password'),
-            'role' => 'leader',
+            'role' => 'pengurus',
         ]);
 
         // Loop for 3 members per division in Org 2

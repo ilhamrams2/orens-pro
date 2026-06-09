@@ -58,7 +58,7 @@
                         </a>
                     @endif
 
-                    @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin')
+                    @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'pembina')
                         <a href="{{ route('divisions.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ Request::is('admin/divisions*') ? 'sidebar-item-active' : 'text-gray-500 hover:bg-gray-50' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             <span class="font-medium">Divisi</span>
@@ -69,7 +69,7 @@
                         </a>
                     @endif
 
-                    @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'admin' || auth()->user()->role === 'leader')
+                    @if(auth()->user()->role === 'superadmin' || auth()->user()->role === 'pembina' || auth()->user()->role === 'pengurus')
                         <a href="{{ route('sessions.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ Request::is('sessions*') ? 'sidebar-item-active' : 'text-gray-500 hover:bg-gray-50' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             <span class="font-medium">Sesi Presensi</span>
@@ -123,7 +123,9 @@
                 <div class="flex items-center gap-2 sm:gap-4 lg:gap-6">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-bold text-gray-900 leading-tight">{{ auth()->user()->name }}</p>
-                        <p class="text-[10px] font-bold text-orens uppercase tracking-tight">{{ auth()->user()->role }}</p>
+                        <p class="text-[10px] font-bold text-orens uppercase tracking-tight">
+                            {{ auth()->user()->role === 'pembina' ? 'Pembina' : (auth()->user()->role === 'pengurus' ? 'Pengurus' : auth()->user()->role) }}
+                        </p>
                     </div>
                     <form action="{{ url('/logout') }}" method="POST" class="m-0">
                         @csrf

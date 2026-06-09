@@ -17,10 +17,10 @@ class AttendanceSessionController extends Controller
         $user = $request->user();
         $query = AttendanceSession::with(['organisation', 'division', 'creator']);
 
-        if ($user->role === 'leader') {
+        if ($user->role === 'pengurus') {
             $query->where('division_id', $user->division_id)
                   ->where('organisation_id', $user->organisation_id);
-        } elseif ($user->role === 'admin') {
+        } elseif ($user->role === 'pembina') {
             $query->where('organisation_id', $user->organisation_id);
         }
 
@@ -67,7 +67,7 @@ class AttendanceSessionController extends Controller
         } else {
             $organisations = Organisation::where('id', $user->organisation_id)->get();
             $divisions = Division::where('organisation_id', $user->organisation_id);
-            if ($user->role === 'leader') {
+            if ($user->role === 'pengurus') {
                 $divisions->where('id', $user->division_id);
             }
             $divisions = $divisions->get();
@@ -94,7 +94,7 @@ class AttendanceSessionController extends Controller
         ]);
 
         $divisionId = $request->division_id;
-        if ($user->role === 'leader') {
+        if ($user->role === 'pengurus') {
             $divisionId = $user->division_id;
         }
 

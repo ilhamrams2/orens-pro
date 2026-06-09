@@ -13,7 +13,7 @@ class AttendanceSessionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['superadmin', 'admin', 'leader']);
+        return in_array($user->role, ['superadmin', 'pembina', 'pengurus']);
     }
 
     /**
@@ -23,11 +23,11 @@ class AttendanceSessionPolicy
     {
         if ($user->role === 'superadmin') return true;
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             return $user->organisation_id === $attendanceSession->organisation_id;
         }
 
-        if ($user->role === 'leader') {
+        if ($user->role === 'pengurus') {
             return $user->organisation_id === $attendanceSession->organisation_id 
                 && $user->division_id === $attendanceSession->division_id;
         }
@@ -40,7 +40,7 @@ class AttendanceSessionPolicy
      */
     public function create(User $user): bool
     {
-        return in_array($user->role, ['superadmin', 'admin', 'leader']);
+        return in_array($user->role, ['superadmin', 'pembina', 'pengurus']);
     }
 
     /**
@@ -50,11 +50,11 @@ class AttendanceSessionPolicy
     {
         if ($user->role === 'superadmin') return true;
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'pembina') {
             return $user->organisation_id === $attendanceSession->organisation_id;
         }
 
-        if ($user->role === 'leader') {
+        if ($user->role === 'pengurus') {
             return $user->organisation_id === $attendanceSession->organisation_id 
                 && $user->division_id === $attendanceSession->division_id;
         }
