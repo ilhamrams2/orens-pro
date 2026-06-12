@@ -11,7 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return view('welcome');
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
