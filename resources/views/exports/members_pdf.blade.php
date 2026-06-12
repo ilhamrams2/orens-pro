@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Member Attendance Report</title>
+    <title>Laporan Kehadiran Anggota</title>
     <style>
         body { font-family: sans-serif; }
         .header { text-align: center; margin-bottom: 30px; }
@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>LAPORAN KEHADIRAN MEMBER</h1>
+        <h1>LAPORAN KEHADIRAN ANGGOTA</h1>
         <p>{{ $organisation }}</p>
         <p>Tanggal: {{ $date }}</p>
     </div>

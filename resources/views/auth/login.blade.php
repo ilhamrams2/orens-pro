@@ -5,18 +5,16 @@
     <div class="glass-card w-full max-w-[480px] p-8 sm:p-10 md:p-14 animate-slide-up">
         <div class="text-center mb-8 sm:mb-10">
             <div class="w-16 h-16 sm:w-20 sm:h-20 bg-orens/10 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-transform hover:scale-110 duration-500">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-orens sm:w-10 sm:h-10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
+                <img src="{{ asset('images/logo.png') }}" class="w-10 h-10 sm:w-12 sm:h-12 object-contain" alt="Logo">
             </div>
-            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-2 sm:mb-3">Welcome</h1>
-            <p class="text-sm sm:text-base text-text-secondary leading-relaxed">Sign in to manage your attendance with <span class="text-orens font-bold">Orens Pro</span></p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-2 sm:mb-3">Selamat Datang</h1>
+            <p class="text-sm sm:text-base text-text-secondary leading-relaxed">Masuk untuk mengelola kehadiran Anda dengan <span class="text-orens font-bold">Orens Pro</span></p>
         </div>
 
         <form action="{{ url('/login') }}" method="POST" class="space-y-6">
             @csrf
             <div>
-                <label class="block text-sm font-bold mb-2.5 text-text-primary ml-1">Email Address</label>
+                <label class="block text-sm font-bold mb-2.5 text-text-primary ml-1">Alamat Email</label>
                 <input type="email" name="email" value="{{ old('email') }}" required 
                     class="input-premium"
                     placeholder="name@prestasiprima.sch.id">
@@ -30,8 +28,8 @@
 
             <div>
                 <div class="flex justify-between items-center mb-2.5 ml-1">
-                    <label class="text-sm font-bold text-text-primary">Password</label>
-                    <a href="#" class="text-orens text-xs font-bold hover:text-orens-light transition-colors">Forgot Password?</a>
+                    <label class="text-sm font-bold text-text-primary">Kata Sandi</label>
+                    <a href="#" class="text-orens text-xs font-bold hover:text-orens-light transition-colors">Lupa Kata Sandi?</a>
                 </div>
                 <input type="password" name="password" required 
                     class="input-premium"
@@ -40,13 +38,13 @@
 
             <div class="pt-2">
                 <button type="submit" class="btn-premium w-full bg-orens text-white shadow-premium hover:bg-orens-light hover:-translate-y-0.5">
-                    Sign In to Portal
+                    Masuk ke Portal
                 </button>
             </div>
 
             <div class="text-center mt-10">
                 <p class="text-text-secondary text-sm">
-                    Don't have an account? <a href="#" class="text-orens font-black hover:underline underline-offset-4">Join Orens Pro</a>
+                    Belum punya akun? Hubungi Admin sekolah.
                 </p>
             </div>
         </form>

@@ -41,19 +41,19 @@
         <div class="lg:col-span-4 space-y-6">
             <div class="bg-gray-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden group">
                 <div class="absolute -right-5 -bottom-5 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700"></div>
-                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-orens-light mb-6">Account Status</h3>
+                <h3 class="text-sm font-black uppercase tracking-[0.2em] text-orens-light mb-6">Status Akun</h3>
                 <div class="space-y-6">
                     <div class="flex items-center justify-between group/item">
-                        <span class="text-xs font-bold text-gray-400 uppercase">Verification</span>
-                        <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-green-500/30">Verified</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase">Verifikasi</span>
+                        <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-green-500/30">Terverifikasi</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-400 uppercase">Join Date</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase">Tanggal Bergabung</span>
                         <span class="text-xs font-black">{{ $user->created_at->format('M Y') }}</span>
                     </div>
                 </div>
                 <div class="mt-8 pt-8 border-t border-white/10 space-y-4">
-                    <p class="text-[10px] text-gray-400 leading-relaxed font-medium italic opacity-60">"Your account is managed under {{ $user->organisation?->name ?? 'Global System' }} policy."</p>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-medium italic opacity-60">"Akun Anda dikelola berdasarkan kebijakan {{ $user->organisation?->name ?? 'Sistem Global' }}."</p>
                 </div>
             </div>
 
@@ -63,10 +63,10 @@
                     <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <h4 class="font-black text-sm uppercase tracking-widest">Security Tip</h4>
+                    <h4 class="font-black text-sm uppercase tracking-widest">Tips Keamanan</h4>
                 </div>
                 <p class="text-xs font-medium text-blue-50 leading-relaxed">
-                    Use a strong password with symbols and numbers to ensure your attendance data remains secure.
+                    Gunakan kata sandi yang kuat dengan simbol dan angka untuk memastikan data kehadiran Anda tetap aman.
                 </p>
             </div>
         </div>
@@ -80,25 +80,25 @@
                 <div class="bg-white p-8 md:p-10 rounded-[40px] border border-gray-100 shadow-sm space-y-8">
                     <div class="flex items-center gap-3">
                         <div class="w-2 h-8 bg-orens rounded-full"></div>
-                        <h3 class="text-2xl font-black text-gray-800 font-outfit">Identity Details</h3>
+                        <h3 class="text-2xl font-black text-gray-800 font-outfit">Detail Identitas</h3>
                     </div>
 
                     <div class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Full Display Name</label>
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-orens transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 </span>
                                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required
                                     class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all text-sm font-bold text-gray-700"
-                                    placeholder="Enter your name">
+                                    placeholder="Masukkan nama Anda">
                             </div>
                             @error('name') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Official Email Address Address</label>
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Alamat Email Resmi</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-orens transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
@@ -116,12 +116,12 @@
                 <div class="bg-white p-8 md:p-10 rounded-[40px] border border-gray-100 shadow-sm space-y-8">
                     <div class="flex items-center gap-3">
                         <div class="w-2 h-8 bg-blue-500 rounded-full"></div>
-                        <h3 class="text-2xl font-black text-gray-800 font-outfit">Security Update</h3>
+                        <h3 class="text-2xl font-black text-gray-800 font-outfit">Pembaruan Keamanan</h3>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">New Password</label>
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Kata Sandi Baru</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -133,7 +133,7 @@
                             @error('password') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Confirm New Password</label>
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Konfirmasi Kata Sandi Baru</label>
                             <div class="relative group">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
@@ -148,7 +148,7 @@
 
                 <div class="flex justify-center md:justify-end pt-4">
                     <button type="submit" class="w-full md:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-orens to-orange-600 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] sm:text-xs hover:scale-105 transition-all shadow-2xl shadow-orens/30 flex items-center justify-center gap-4 group active:scale-95">
-                        Update My Account
+                        Perbarui Akun Saya
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </button>
                 </div>

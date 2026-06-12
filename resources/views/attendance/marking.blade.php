@@ -4,12 +4,12 @@
 <div class="space-y-6">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Mark Attendance</h1>
+            <h1 class="text-3xl font-bold text-gray-800">Tandai Kehadiran</h1>
             <p class="text-gray-500 font-medium">{{ $session->title }} • {{ \Carbon\Carbon::parse($session->session_date)->format('d M Y') }}</p>
         </div>
         <div class="flex gap-3">
-            <a href="{{ route('sessions.index') }}" class="px-6 py-3 bg-white border border-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all text-sm">Cancel</a>
-            <button form="marking-form" type="submit" class="px-8 py-3 bg-orens text-white rounded-xl font-bold hover:bg-orens-light transition-all shadow-lg shadow-orens/20 text-sm">Save Changes</button>
+            <a href="{{ route('sessions.index') }}" class="px-6 py-3 bg-white border border-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all text-sm">Batal</a>
+            <button form="marking-form" type="submit" class="px-8 py-3 bg-orens text-white rounded-xl font-bold hover:bg-orens-light transition-all shadow-lg shadow-orens/20 text-sm">Simpan Perubahan</button>
         </div>
     </div>
 
@@ -20,11 +20,11 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                            <th class="px-4 py-4">Member</th>
+                            <th class="px-4 py-4">Anggota</th>
                             <th class="px-4 py-4 text-center w-32 tracking-wider">Hadir</th>
                             <th class="px-4 py-4 text-center w-32 tracking-wider">Sakit</th>
                             <th class="px-4 py-4 text-center w-32 tracking-wider">Izin</th>
-                            <th class="px-4 py-4 text-center w-32 tracking-wider">Alpha</th>
+                            <th class="px-4 py-4 text-center w-32 tracking-wider">Alpa</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">

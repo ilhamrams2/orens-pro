@@ -4,12 +4,12 @@
 <div class="space-y-4 lg:space-y-6">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Divisions</h1>
-            <p class="text-xs sm:text-sm text-gray-500 font-medium">Manage divisions within your organisations.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Divisi</h1>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium">Kelola divisi di dalam organisasi Anda.</p>
         </div>
         <a href="{{ route('divisions.create') }}" class="bg-orens text-white px-5 py-3 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-orens/20 w-full sm:w-auto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Add Division</span>
+            <span>Tambah Divisi</span>
         </a>
     </div>
 
@@ -24,9 +24,9 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-4 lg:px-8 py-4">Name</th>
-                        <th class="px-4 lg:px-8 py-4">Organisation</th>
-                        <th class="px-4 lg:px-8 py-4 text-right">Actions</th>
+                        <th class="px-4 lg:px-8 py-4">Nama</th>
+                        <th class="px-4 lg:px-8 py-4">Organisasi</th>
+                        <th class="px-4 lg:px-8 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -42,13 +42,13 @@
                             </td>
                             <td class="px-4 lg:px-8 py-4 lg:py-5 text-right">
                                 <div class="flex justify-end items-center gap-1 sm:gap-2">
-                                    <a href="{{ route('divisions.edit', $div) }}" class="p-2 text-gray-400 hover:text-orens hover:bg-orens/5 rounded-xl transition-all" title="Edit Division">
+                                    <a href="{{ route('divisions.edit', $div) }}" class="p-2 text-gray-400 hover:text-orens hover:bg-orens/5 rounded-xl transition-all" title="Edit Divisi">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
-                                    <form action="{{ route('divisions.destroy', $div) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="m-0">
+                                    <form action="{{ route('divisions.destroy', $div) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus divisi ini? Anggota yang berada di divisi ini akan dipindahkan.')" class="m-0">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Delete Division">
+                                        <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Hapus Divisi">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
                                     </form>
@@ -58,7 +58,7 @@
                     @empty
                         <tr>
                             <td colspan="3" class="px-4 lg:px-8 py-12 text-center text-gray-400 font-medium italic text-sm">
-                                No divisions found.
+                                Divisi tidak ditemukan.
                             </td>
                         </tr>
                     @endforelse

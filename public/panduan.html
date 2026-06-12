@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan & Dokumentasi Sistem - Orens Pro</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        orens: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                        darkslate: '#0F172A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .dark-glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .circle-blur {
+            filter: blur(90px);
+            animation: float 18s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, 60px) scale(1.15); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased selection:bg-orens-200 selection:text-orens-900">
+    
+    <!-- Background Decorative Circles -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden">
+        <div class="circle-blur absolute w-[500px] h-[500px] rounded-full bg-orens-200/20 -top-40 -right-40"></div>
+        <div class="circle-blur absolute w-[400px] h-[400px] rounded-full bg-blue-100/30 bottom-10 -left-20" style="animation-delay: -6s;"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 glass border-b border-slate-200/50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Logo Simbolis -->
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orens-600 to-amber-500 flex items-center justify-center text-white font-outfit font-extrabold text-xl shadow-lg shadow-orens-500/20">
+                    O
+                </div>
+                <div>
+                    <span class="font-outfit font-bold text-xl tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Orens Pro</span>
+                    <span class="block text-[10px] text-slate-500 font-semibold tracking-wider uppercase">Dokumentasi Sistem</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-slate-600">
+                <a href="#ikhtisar" class="hover:text-orens-600 transition-colors">Ikhtisar</a>
+                <a href="#workflow" class="hover:text-orens-600 transition-colors">Cara Kerja</a>
+                <a href="#roles" class="hover:text-orens-600 transition-colors">Hak Akses</a>
+                <a href="#grading" class="hover:text-orens-600 transition-colors">Sistem Penilaian</a>
+                <a href="#simulasi" class="hover:text-orens-600 transition-colors">Simulasi Absen</a>
+            </nav>
+            <div>
+                <a href="/dashboard" class="px-5  py-2.5 rounded-xl bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition-all hover:shadow-lg shadow-slate-900/10">
+                    Masuk ke Sistem
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        
+        <!-- Hero Section -->
+        <section class="text-center mb-16 relative">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 mb-6 rounded-full bg-orens-50 border border-orens-200/50 text-orens-700 text-xs font-semibold uppercase tracking-wider">
+                <span>Versi 1.0.0</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-orens-500 animate-pulse"></span>
+                <span>Production Ready</span>
+            </div>
+            <h1 class="font-outfit font-extrabold text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight mb-6">
+                Bagaimana <span class="bg-gradient-to-r from-orens-600 to-amber-500 bg-clip-text text-transparent">Orens Pro</span><br class="hidden md:block"> Mengamankan & Mengelola Presensi Anda
+            </h1>
+            <p class="max-w-2xl mx-auto text-base md:text-lg text-slate-500 leading-relaxed mb-8">
+                Dokumentasi interaktif mengenai alur kerja, arsitektur, pembagian hak akses, sistem penilaian cerdas, serta teknologi pencegah manipulasi lokasi dan kode QR.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="#workflow" class="px-6 py-3 rounded-xl bg-gradient-to-r from-orens-600 to-amber-500 text-white font-bold text-sm hover:shadow-lg hover:shadow-orens-500/25 transition-all">
+                    Pelajari Cara Kerja
+                </a>
+                <a href="#simulasi" class="px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all">
+                    Uji Coba Simulasi
+                </a>
+            </div>
+        </section>
+
+        <!-- Ikhtisar Section -->
+        <section id="ikhtisar" class="mb-20 scroll-mt-24">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="font-outfit font-bold text-3xl text-slate-900 mb-4">Apa itu Orens Pro?</h2>
+                    <p class="text-slate-600 leading-relaxed mb-6 text-justify">
+                        <strong>Orens Pro</strong> adalah sistem manajemen kehadiran (presensi) bertingkat yang dirancang khusus untuk ekosistem sekolah / yayasan **Prestasi Prima** (SMK & SMA Prestasi Prima). Sistem ini memfasilitasi pencatatan kehadiran anggota organisasi kesiswaan atau kelompok belajar dengan verifikasi ganda yang presisi guna meminimalkan manipulasi kehadiran (absen titip nama).
+                    </p>
+                    <p class="text-slate-600 leading-relaxed mb-6 text-justify">
+                        Dengan memadukan pembatasan domain email sekolah, koordinat global GPS (Geofencing), dan rotasi kode QR secara dinamis berbasis waktu, Orens Pro memastikan setiap kehadiran tercatat secara valid, aman, dan langsung (real-time).
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white rounded-2xl border border-slate-100">
+                            <span class="block text-2xl font-bold text-slate-900 mb-1">0%</span>
+                            <span class="text-xs text-slate-500 font-medium">Toleransi Titip Absen</span>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl border border-slate-100">
+                            <span class="block text-2xl font-bold text-slate-900 mb-1">30 Detik</span>
+                            <span class="text-xs text-slate-500 font-medium">Rotasi Token QR Dinamis</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Kartu Teknologi Utama -->
+                <div class="grid gap-6">
+                    <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4 hover:translate-x-2 transition-transform">
+                        <div class="p-3 bg-orens-50 text-orens-600 rounded-xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11.5V9m12.754 11.43a13.924 13.924 0 00-2.587-4.148M14 9V5a2 2 0 00-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-4a2 2 0 00-2-2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-outfit font-bold text-lg text-slate-900 mb-1">Rotasi QR Token Dinamis</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed">
+                                Menggunakan standar enkripsi industri (SHA256 HMAC) berbasis waktu jendela (window) 30 detik. Kode QR yang ditayangkan akan berubah secara berkala sehingga siswa tidak bisa membagikan screenshot kode QR ke temannya di luar lokasi.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4 hover:translate-x-2 transition-transform">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-outfit font-bold text-lg text-slate-900 mb-1">GPS Geofencing Absolut</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed">
+                                Titik absensi dipasang dengan radius toleransi tertentu (misal: 100 meter). Sistem membandingkan koordinat lokasi perangkat siswa secara real-time dengan titik lokasi resmi sesi absensi.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4 hover:translate-x-2 transition-transform">
+                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-outfit font-bold text-lg text-slate-900 mb-1">Log Audit & Transaksi Aman</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed">
+                                Setiap aktivitas login, perubahan data absensi, ekspor laporan, dan manipulasi data pengguna dicatat lengkap dalam Log Audit demi akuntabilitas pengurus dan pembina.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cara Kerja / Workflow Section -->
+        <section id="workflow" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="font-outfit font-bold text-3xl text-slate-900 mb-2">Bagaimana Sistem Bekerja?</h2>
+                <p class="text-slate-500 text-sm">Alur lengkap dari inisiasi sesi absensi oleh pengurus hingga penyimpanan data kehadiran.</p>
+            </div>
+
+            <!-- Alur Langkah (Visual Steps) -->
+            <div class="grid md:grid-cols-4 gap-6 relative">
+                <!-- Step 1 -->
+                <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm text-center relative">
+                    <div class="w-10 h-10 rounded-full bg-orens-50 text-orens-600 flex items-center justify-center font-bold font-outfit text-base mx-auto mb-4 border border-orens-100">
+                        1
+                    </div>
+                    <h3 class="font-outfit font-bold text-slate-900 mb-2">Pembuatan Sesi</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Pembina atau Pengurus membuat sesi absensi di Dashboard. Sesi dikaitkan dengan organisasi, divisi, waktu mulai-selesai, koordinat latitude/longitude, dan radius aman.
+                    </p>
+                </div>
+                <!-- Step 2 -->
+                <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm text-center relative">
+                    <div class="w-10 h-10 rounded-full bg-orens-50 text-orens-600 flex items-center justify-center font-bold font-outfit text-base mx-auto mb-4 border border-orens-100">
+                        2
+                    </div>
+                    <h3 class="font-outfit font-bold text-slate-900 mb-2">Penayangan Kode QR</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Pengurus menayangkan halaman QR Code di layar utama/proyektor kelas. Server memutar token QR setiap 30 detik menggunakan algoritma hashing hash_hmac SHA256.
+                    </p>
+                </div>
+                <!-- Step 3 -->
+                <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm text-center relative">
+                    <div class="w-10 h-10 rounded-full bg-orens-50 text-orens-600 flex items-center justify-center font-bold font-outfit text-base mx-auto mb-4 border border-orens-100">
+                        3
+                    </div>
+                    <h3 class="font-outfit font-bold text-slate-900 mb-2">Pemindaian & GPS</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Member login menggunakan email sekolah, memindai QR, dan mengirimkan koordinat GPS perangkat mereka ke server untuk diverifikasi secara aman.
+                    </p>
+                </div>
+                <!-- Step 4 -->
+                <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm text-center relative">
+                    <div class="w-10 h-10 rounded-full bg-orens-50 text-orens-600 flex items-center justify-center font-bold font-outfit text-base mx-auto mb-4 border border-orens-100">
+                        4
+                    </div>
+                    <h3 class="font-outfit font-bold text-slate-900 mb-2">Pencatatan Kehadiran</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Server memvalidasi kesesuaian waktu, validitas token QR, dan jarak geofencing. Jika semua lolos, status absen dicatat "Hadir" secara instan.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Penjelasan Teknis Geofencing & QR -->
+            <div class="mt-8 p-6 bg-slate-900 text-white rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="max-w-xl">
+                    <h4 class="font-outfit font-bold text-lg mb-2 text-orens-400">🛡️ Proteksi Anti-Cheat Singapore Enterprise Standard</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Sistem membolehkan scan QR dengan token dari jendela waktu berjalan (Current Window) dan jendela waktu tepat sebelumnya (Previous Window). Toleransi ini disiapkan agar member yang memiliki koneksi internet agak lambat saat mengirim data ke server tidak gagal absen, namun tetap membatasi penyebaran screenshot QR di luar durasi 30-60 detik.
+                    </p>
+                </div>
+                <div class="p-4 bg-white/5 rounded-xl border border-white/10 text-center w-full md:w-auto">
+                    <span class="block text-2xl font-mono text-orens-400 font-bold tracking-widest" id="running-token-hash">h7a8...9f2</span>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Representasi Hash QR Berjalan</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hak Akses / User Roles Section -->
+        <section id="roles" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="font-outfit font-bold text-3xl text-slate-900 mb-2">Hak Akses & Peran Pengguna (RBAC)</h2>
+                <p class="text-slate-500 text-sm">Orens Pro membagi izin akses pengguna ke dalam 4 tingkatan penting.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6">
+                <!-- Role Superadmin -->
+                <div class="p-6 bg-white rounded-2xl border-t-4 border-t-red-500 border-x border-b border-slate-100 shadow-sm">
+                    <span class="inline-block px-2.5 py-0.5 mb-4 rounded bg-red-50 text-red-600 font-bold text-[10px] uppercase tracking-wider">Level 4</span>
+                    <h3 class="font-outfit font-bold text-lg text-slate-900 mb-2">Superadmin</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                        Pemegang otoritas tertinggi sistem. Bertanggung jawab atas kesehatan aplikasi secara global.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-4">
+                        <li class="flex items-center"><span class="text-red-500 mr-2">✓</span> Kelola Seluruh Organisasi</li>
+                        <li class="flex items-center"><span class="text-red-500 mr-2">✓</span> Kelola Divisi Global</li>
+                        <li class="flex items-center"><span class="text-red-500 mr-2">✓</span> Lihat Audit Log System</li>
+                        <li class="flex items-center"><span class="text-red-500 mr-2">✓</span> Manajemen Semua Akun</li>
+                    </ul>
+                </div>
+
+                <!-- Role Pembina -->
+                <div class="p-6 bg-white rounded-2xl border-t-4 border-t-orens-500 border-x border-b border-slate-100 shadow-sm">
+                    <span class="inline-block px-2.5 py-0.5 mb-4 rounded bg-orens-50 text-orens-600 font-bold text-[10px] uppercase tracking-wider">Level 3</span>
+                    <h3 class="font-outfit font-bold text-lg text-slate-900 mb-2">Pembina</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                        Penanggung jawab organisasi kesiswaan tertentu (misalnya: Pembina Orens Solution).
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-4">
+                        <li class="flex items-center"><span class="text-orens-500 mr-2">✓</span> Kelola Akun Member & Pengurus</li>
+                        <li class="flex items-center"><span class="text-orens-500 mr-2">✓</span> Reset Periode Nilai Keaktifan</li>
+                        <li class="flex items-center"><span class="text-orens-500 mr-2">✓</span> Ekspor Laporan Excel/PDF</li>
+                        <li class="flex items-center"><span class="text-orens-500 mr-2">✓</span> Impor Data CSV Member</li>
+                    </ul>
+                </div>
+
+                <!-- Role Pengurus -->
+                <div class="p-6 bg-white rounded-2xl border-t-4 border-t-blue-500 border-x border-b border-slate-100 shadow-sm">
+                    <span class="inline-block px-2.5 py-0.5 mb-4 rounded bg-blue-50 text-blue-600 font-bold text-[10px] uppercase tracking-wider">Level 2</span>
+                    <h3 class="font-outfit font-bold text-lg text-slate-900 mb-2">Pengurus</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                        Pengelola kegiatan di level divisi (misalnya: divisi Game atau Cyber Security).
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-4">
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> Buat & Tayangkan Sesi Absensi</li>
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> Pencatatan Kehadiran Manual</li>
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> Lihat Sesi & Log Absen Divisi</li>
+                        <li class="flex items-center"><span class="text-slate-400 mr-2">✗</span> Tidak Bisa Reset Grade</li>
+                    </ul>
+                </div>
+
+                <!-- Role Member -->
+                <div class="p-6 bg-white rounded-2xl border-t-4 border-t-emerald-500 border-x border-b border-slate-100 shadow-sm">
+                    <span class="inline-block px-2.5 py-0.5 mb-4 rounded bg-emerald-50 text-emerald-600 font-bold text-[10px] uppercase tracking-wider">Level 1</span>
+                    <h3 class="font-outfit font-bold text-lg text-slate-900 mb-2">Member</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                        Anggota biasa / siswa yang mengikuti kegiatan organisasi atau divisi terkait.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-2 border-t border-slate-100 pt-4">
+                        <li class="flex items-center"><span class="text-emerald-500 mr-2">✓</span> Melakukan Absen Mandiri (QR & GPS)</li>
+                        <li class="flex items-center"><span class="text-emerald-500 mr-2">✓</span> Melihat Riwayat Absensi Pribadi</li>
+                        <li class="flex items-center"><span class="text-emerald-500 mr-2">✓</span> Melihat Grade Kehadiran Aktif</li>
+                        <li class="flex items-center"><span class="text-slate-400 mr-2">✗</span> Tidak Bisa Akses Panel Admin</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sistem Penilaian & Grade Section -->
+        <section id="grading" class="mb-20 scroll-mt-24">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Visualisasi Grade Card -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-6 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl shadow-lg relative overflow-hidden">
+                        <div class="absolute -right-4 -bottom-4 text-white/10 font-outfit font-black text-8xl">A</div>
+                        <span class="block text-xs font-semibold text-emerald-100 uppercase tracking-widest mb-1">Grade Utama</span>
+                        <span class="block text-3xl font-extrabold font-outfit mb-3">Grade A</span>
+                        <p class="text-[11px] text-emerald-50 leading-relaxed">
+                            Mewakili keaktifan sangat baik. Member harus hadir minimal **4 kali** dalam periode berjalan.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl shadow-lg relative overflow-hidden">
+                        <div class="absolute -right-4 -bottom-4 text-white/10 font-outfit font-black text-8xl">B</div>
+                        <span class="block text-xs font-semibold text-blue-100 uppercase tracking-widest mb-1">Grade Menengah</span>
+                        <span class="block text-3xl font-extrabold font-outfit mb-3">Grade B</span>
+                        <p class="text-[11px] text-blue-50 leading-relaxed">
+                            Mewakili keaktifan cukup. Member harus hadir minimal **2 kali** dalam periode berjalan.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-white border border-slate-100 rounded-2xl shadow-sm relative overflow-hidden col-span-2">
+                        <div class="absolute -right-4 -bottom-4 text-slate-100 font-outfit font-black text-8xl">-</div>
+                        <span class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Tanpa Grade</span>
+                        <span class="block text-2xl font-bold font-outfit text-slate-800 mb-2">Grade Strip (-)</span>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Kehadiran di bawah **2 kali** dalam periode absensi aktif.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Penjelasan Reset Periodik -->
+                <div>
+                    <h2 class="font-outfit font-bold text-3xl text-slate-900 mb-4">Mekanisme Penilaian & Reset Periodik</h2>
+                    <p class="text-slate-600 leading-relaxed mb-4 text-justify">
+                        Sistem akumulasi Orens Pro melacak seluruh riwayat absen "Hadir" yang dibuat **setelah tanggal reset terakhir**. Hal ini memudahkan Pembina untuk menetapkan periode penilaian per semester, per triwulan, atau bulanan secara fleksibel.
+                    </p>
+                    <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+                        <h4 class="font-bold text-sm text-amber-800 mb-1">⚠️ Aturan Pengisian Sesi Kedaluwarsa</h4>
+                        <p class="text-xs text-amber-700 leading-relaxed">
+                            Setiap kali pengguna mengakses dashboard atau sistem melakukan pembersihan berkala, sesi yang telah melewati jam selesai (`end_time`) akan dinonaktifkan secara otomatis. Di saat yang bersamaan, seluruh member yang terdaftar di organisasi/divisi sesi tersebut namun <strong>tidak melakukan absen</strong> akan otomatis diisi statusnya sebagai <strong>Alpha</strong> untuk keadilan data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Simulasi Absensi Interaktif -->
+        <section id="simulasi" class="mb-20 scroll-mt-24 p-8 bg-white border border-slate-100 rounded-3xl shadow-sm">
+            <div class="max-w-2xl mx-auto text-center mb-10">
+                <span class="text-xs font-bold text-orens-600 uppercase tracking-widest">Interactive Playground</span>
+                <h2 class="font-outfit font-bold text-3xl text-slate-900 mt-1 mb-2">Simulasi Proses Absen Mandiri</h2>
+                <p class="text-slate-500 text-xs">Uji coba simulasi logika validasi server untuk melihat bagaimana koordinat GPS dan token QR diperiksa.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Panel Input User -->
+                <div class="space-y-4">
+                    <h3 class="font-outfit font-bold text-sm text-slate-700 uppercase tracking-wider mb-2">1. Konfigurasi Simulasi</h3>
+                    
+                    <!-- Token QR -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Token QR Scanner</label>
+                        <select id="sim-qr" class="w-full px-4 py-2 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-orens-500 outline-none">
+                            <option value="VALID">Token QR Cocok (Masih Aktif / Fresh)</option>
+                            <option value="EXPIRED">Token QR Kedaluwarsa (Ditayangkan > 30 Detik Lalu)</option>
+                            <option value="INVALID">Token QR Palsu / Screenshot Lama</option>
+                        </select>
+                    </div>
+
+                    <!-- Geofencing Koordinat -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Jarak Perangkat Member ke Lokasi Sesi</label>
+                        <select id="sim-distance" class="w-full px-4 py-2 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-orens-500 outline-none">
+                            <option value="50">50 Meter (Berada dalam Radius Toleransi 100m)</option>
+                            <option value="95">95 Meter (Berada dalam Radius Toleransi 100m)</option>
+                            <option value="150">150 Meter (Di Luar Jangkauan Absen)</option>
+                            <option value="500">500 Meter (Di Rumah / Terlalu Jauh)</option>
+                        </select>
+                    </div>
+
+                    <!-- Tombol Cek -->
+                    <button onclick="runSimulation()" class="w-full py-3 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition-colors">
+                        Kirim Absensi & Jalankan Validasi Server
+                    </button>
+                </div>
+
+                <!-- Output Simulasi -->
+                <div class="flex flex-col justify-between p-6 bg-slate-50 rounded-2xl border border-slate-200/50">
+                    <div>
+                        <h3 class="font-outfit font-bold text-sm text-slate-700 uppercase tracking-wider mb-4">2. Respon Server (JSON API)</h3>
+                        
+                        <!-- Box Response -->
+                        <div id="sim-response-box" class="p-4 rounded-xl border font-mono text-xs overflow-x-auto bg-slate-900 border-slate-800 text-slate-300">
+                            Menunggu input simulasi...
+                        </div>
+                    </div>
+
+                    <!-- Penjelasan Hasil Status -->
+                    <div id="sim-explanation" class="mt-4 text-xs text-slate-500 leading-relaxed border-t border-slate-200 pt-4">
+                        Pilih konfigurasi parameter di samping kiri lalu klik tombol kirim untuk melihat status respon dan logika yang memengaruhinya.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+            <div>
+                <h4 class="font-outfit font-bold text-lg text-orens-400 mb-4">Orens Pro</h4>
+                <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    Sistem Absensi Ganda Terintegrasi dengan Standar Keamanan Geofencing dan Dynamic Token QR untuk SMK & SMA Prestasi Prima.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-outfit font-bold text-sm text-slate-200 mb-4">Pintasan Dokumentasi</h4>
+                <ul class="text-xs text-slate-400 space-y-2">
+                    <li><a href="#ikhtisar" class="hover:text-white transition-colors">Tentang Aplikasi</a></li>
+                    <li><a href="#workflow" class="hover:text-white transition-colors">Mekanisme Dynamic QR</a></li>
+                    <li><a href="#roles" class="hover:text-white transition-colors">Tingkat Hak Akses</a></li>
+                    <li><a href="#simulasi" class="hover:text-white transition-colors">Simulator Validasi</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-outfit font-bold text-sm text-slate-200 mb-4">Kontak Dukungan</h4>
+                <p class="text-xs text-slate-400 leading-relaxed mb-2">
+                    Jika ada masalah dengan sistem Geofencing atau sinkronisasi token, hubungi Tim IT Administrator Orens Pro.
+                </p>
+                <span class="block text-xs font-semibold text-orens-400">admin@smkprestasiprima.sch.id</span>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 border-t border-slate-800 mt-8 pt-6 text-center text-xs text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+            <span>&copy; 2026 Orens Pro. All rights reserved.</span>
+            <span>Made for Prestasi Prima Educational Institution</span>
+        </div>
+    </footer>
+
+    <!-- Script Simulasi -->
+    <script>
+        // Simulasi Rotasi Token QR untuk Aset Visual
+        setInterval(() => {
+            const chars = '0123456789abcdef';
+            let mockHash = '';
+            for (let i = 0; i < 8; i++) {
+                mockHash += chars[Math.floor(Math.random() * 16)];
+            }
+            document.getElementById('running-token-hash').innerText = mockHash + '...7a' + Math.floor(Math.random() * 10) + 'c';
+        }, 3000);
+
+        function runSimulation() {
+            const qrType = document.getElementById('sim-qr').value;
+            const distance = parseInt(document.getElementById('sim-distance').value);
+            
+            const responseBox = document.getElementById('sim-response-box');
+            const explanation = document.getElementById('sim-explanation');
+            
+            responseBox.classList.remove('bg-emerald-950', 'border-emerald-800', 'text-emerald-300', 'bg-rose-950', 'border-rose-900', 'text-rose-300', 'bg-slate-900', 'border-slate-800', 'text-slate-300');
+
+            // Logika Evaluasi mirip AttendanceService.php
+            if (qrType === 'INVALID') {
+                responseBox.classList.add('bg-rose-950', 'border-rose-900', 'text-rose-300');
+                responseBox.innerHTML = JSON.stringify({
+                    "success": false,
+                    "message": "Kode QR tidak valid atau kedaluwarsa. Silakan pindai kode QR yang terbaru.",
+                    "code": 400,
+                    "timestamp": new Date().toISOString()
+                }, null, 4);
+                explanation.innerHTML = "❌ <strong>Validasi Gagal di Langkah 3 (QR Token):</strong> Token QR yang dikirimkan oleh pemindai tidak cocok dengan tanda tangan rahasia (hash_hmac) server. Hal ini mencegah penggunaan tangkapan layar (screenshot) QR yang dibagikan antar siswa.";
+                return;
+            }
+
+            if (qrType === 'EXPIRED') {
+                responseBox.classList.add('bg-rose-950', 'border-rose-900', 'text-rose-300');
+                responseBox.innerHTML = JSON.stringify({
+                    "success": false,
+                    "message": "Kode QR tidak valid atau kedaluwarsa. Silakan pindai kode QR yang terbaru.",
+                    "code": 400,
+                    "timestamp": new Date().toISOString()
+                }, null, 4);
+                explanation.innerHTML = "❌ <strong>Validasi Gagal di Langkah 3 (QR Token):</strong> Token QR sudah melampaui jendela rotasi (window) 30 detik terakhir. Sistem menolak pemindaian karena kode di layar proyektor sudah berotasi ke hash baru.";
+                return;
+            }
+
+            if (distance > 100) {
+                responseBox.classList.add('bg-rose-950', 'border-rose-900', 'text-rose-300');
+                responseBox.innerHTML = JSON.stringify({
+                    "success": false,
+                    "message": `Anda berada terlalu jauh dari lokasi absensi (jarak: ${distance} meter).`,
+                    "code": 400,
+                    "details": {
+                        "device_distance_meters": distance,
+                        "session_radius_meters": 100
+                    },
+                    "timestamp": new Date().toISOString()
+                }, null, 4);
+                explanation.innerHTML = `❌ <strong>Validasi Gagal di Langkah 4 (Geofencing):</strong> Token QR cocok, namun koordinat GPS perangkat Anda berada sejauh ${distance} meter dari titik absensi resmi, melebihi radius batas toleransi (100 meter).`;
+                return;
+            }
+
+            // Jika lolos semua
+            responseBox.classList.add('bg-emerald-950', 'border-emerald-800', 'text-emerald-300');
+            responseBox.innerHTML = JSON.stringify({
+                "success": true,
+                "message": "Presensi berhasil! Selamat datang di Sesi Pembelajaran.",
+                "code": 200,
+                "data": {
+                    "status": "hadir",
+                    "checkin_time": new Date().toISOString().replace('T', ' ').substring(0, 19),
+                    "verified_distance_meters": distance
+                }
+            }, null, 4);
+            explanation.innerHTML = `✨ <strong>Validasi Berhasil:</strong> Semua pemeriksaan lolos! Token QR valid, dan perangkat Anda terdeteksi berada di dalam area geofencing (${distance} meter dari titik pusat). Absensi Anda dicatat "Hadir" secara aman.`;
+        }
+    </script>
+</body>
+</html>

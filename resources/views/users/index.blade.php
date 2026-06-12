@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <x-ui.header title="Members" subtitle="Manage all members and their performance grades.">
+    <x-ui.header title="Anggota" subtitle="Kelola semua anggota dan nilai performa mereka.">
         <x-ui.button variant="outline" size="sm" :href="route('users.export.excel')">
             <x-slot name="icon">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -26,7 +26,7 @@
             <x-slot name="icon">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             </x-slot>
-            Add Member
+            Tambah Anggota
         </x-ui.button>
         @endif
     </x-ui.header>
@@ -72,13 +72,13 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-4 lg:px-8 py-4">User</th>
-                        <th class="px-4 lg:px-8 py-4">Role</th>
-                        <th class="px-4 lg:px-8 py-4">Organisation / Division</th>
+                        <th class="px-4 lg:px-8 py-4">Pengguna</th>
+                        <th class="px-4 lg:px-8 py-4">Peran</th>
+                        <th class="px-4 lg:px-8 py-4">Organisasi / Divisi</th>
                         @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
-                        <th class="px-4 lg:px-8 py-4 text-center">Grade (Hadir)</th>
+                        <th class="px-4 lg:px-8 py-4 text-center">Nilai (Hadir)</th>
                         @endif
-                        <th class="px-4 lg:px-8 py-4 text-right">Actions</th>
+                        <th class="px-4 lg:px-8 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -89,13 +89,13 @@
                                 <span class="text-xs text-gray-400 truncate block max-w-[150px]">{{ $u->email }}</span>
                             </td>
                             <td class="px-4 lg:px-8 py-5">
-                                <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase {{ $u->role === 'pembina' ? 'bg-purple-50 text-purple-600' : ($u->role === 'pengurus' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500') }} border border-current/10">
-                                    {{ $u->role === 'pembina' ? 'Pembina' : ($u->role === 'pengurus' ? 'Pengurus' : 'Member') }}
+                                <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase {{ $u->role === 'superadmin' ? 'bg-red-50 text-red-600' : ($u->role === 'pembina' ? 'bg-purple-50 text-purple-600' : ($u->role === 'pengurus' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500')) }} border border-current/10">
+                                    {{ $u->role === 'superadmin' ? 'Super Admin' : ($u->role === 'pembina' ? 'Pembina' : ($u->role === 'pengurus' ? 'Pengurus' : 'Anggota')) }}
                                 </span>
                             </td>
                             <td class="px-4 lg:px-8 py-5">
                                 <span class="text-sm font-medium text-gray-600 block">{{ $u->organisation->name ?? '-' }}</span>
-                                <span class="text-xs text-gray-400">{{ $u->division->name ?? 'No Division' }}</span>
+                                <span class="text-xs text-gray-400">{{ $u->division->name ?? 'Tanpa Divisi' }}</span>
                             </td>
                             @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
                             <td class="px-4 lg:px-8 py-5">
@@ -116,7 +116,7 @@
                                     <a href="{{ route('users.edit', $u) }}" class="p-2 text-gray-400 hover:text-orens hover:bg-orens/5 rounded-lg transition-all">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
-                                    <form action="{{ route('users.destroy', $u) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                    <form action="{{ route('users.destroy', $u) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus anggota ini? Aktifitas dan riwayat absensi mereka juga akan dihapus.')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
@@ -128,7 +128,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ in_array(auth()->user()->role, ['pembina', 'superadmin']) ? 5 : 4 }}" class="px-8 py-12 text-center text-gray-400">No members found.</td>
+                            <td colspan="{{ in_array(auth()->user()->role, ['pembina', 'superadmin']) ? 5 : 4 }}" class="px-8 py-12 text-center text-gray-400">Anggota tidak ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -149,7 +149,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <h3 class="text-2xl font-black text-gray-800 font-outfit mb-2">Import Members</h3>
+        <h3 class="text-2xl font-black text-gray-800 font-outfit mb-2">Impor Anggota</h3>
         <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">Unggah Berkas CSV</p>
         
         <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data" class="space-y-6">

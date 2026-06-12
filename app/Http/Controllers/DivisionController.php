@@ -52,7 +52,7 @@ class DivisionController extends Controller
 
         Division::create($request->all());
 
-        return redirect()->route('divisions.index')->with('success', 'Division created successfully.');
+        return redirect()->route('divisions.index')->with('success', 'Divisi berhasil dibuat.');
     }
 
     public function edit(Request $request, Division $division)
@@ -88,7 +88,7 @@ class DivisionController extends Controller
 
         $division->update($request->all());
 
-        return redirect()->route('divisions.index')->with('success', 'Division updated successfully.');
+        return redirect()->route('divisions.index')->with('success', 'Divisi berhasil diperbarui.');
     }
 
     public function destroy(Request $request, Division $division)
@@ -101,6 +101,6 @@ class DivisionController extends Controller
         }
 
         $division->delete();
-        return redirect()->route('divisions.index')->with('success', 'Division deleted successfully.');
+        return redirect()->route('divisions.index')->with('success', 'Divisi berhasil dihapus.');
     }
 }

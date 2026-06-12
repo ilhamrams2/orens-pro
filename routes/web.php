@@ -52,3 +52,7 @@ Route::middleware(['auth', 'role:pembina'])->group(function () {
     Route::resource('/admin/organisations', OrganisationController::class);
     Route::resource('/admin/divisions', DivisionController::class);
 });
+
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::get('/admin/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('admin.audit-logs');
+});

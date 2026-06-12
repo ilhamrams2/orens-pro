@@ -4,15 +4,15 @@
 <div class="p-4 sm:p-6 lg:p-8">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight font-outfit">Attendance Logs</h1>
-            <p class="mt-2 text-sm text-gray-600">Monitoring attempts for: <span class="font-semibold text-orange-600">{{ $session->title }}</span></p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight font-outfit">Log Presensi</h1>
+            <p class="mt-2 text-sm text-gray-600">Memantau percobaan untuk: <span class="font-semibold text-orange-600">{{ $session->title }}</span></p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('sessions.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200">
                 <svg class="mr-2 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Sessions
+                Kembali ke Sesi
             </a>
         </div>
     </div>
@@ -23,10 +23,10 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead>
                     <tr class="bg-gray-50/50">
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Time</th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Coordinates</th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Result / Status</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Waktu</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Pengguna</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Koordinat</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Hasil / Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -42,7 +42,7 @@
                                     {{ strtoupper(substr($log->user?->name ?? '?', 0, 1)) }}
                                 </div>
                                 <div class="ml-3">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $log->user?->name ?? 'Unknown User' }}</div>
+                                    <div class="text-sm font-semibold text-gray-900">{{ $log->user?->name ?? 'Pengguna Tidak Dikenal' }}</div>
                                     <div class="text-xs text-gray-500">{{ $log->user?->email }}</div>
                                 </div>
                             </div>
@@ -58,25 +58,25 @@
                                 </div>
                             </div>
                             @else
-                            <span class="text-gray-400 italic text-xs">No GPS Data</span>
+                            <span class="text-gray-400 italic text-xs">Tidak Ada Data GPS</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             @php 
-                                $isSuccess = str_contains(strtolower($log->result), 'successful');
+                                $isSuccess = str_contains(strtolower($log->result), 'successful') || str_contains(strtolower($log->result), 'berhasil');
                                 $isError = !$isSuccess;
                             @endphp
                             <div class="flex items-center">
                                 @if($isSuccess)
                                 <div class="flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                     </svg>
                                     {{ $log->result }}
                                 </div>
                                 @else
                                 <div class="flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="mr-1.5 h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                     </svg>
                                     {{ $log->result }}
@@ -94,8 +94,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                 </div>
-                                <p class="text-gray-500 font-medium tracking-tight font-outfit">No activity logs found for this session.</p>
-                                <p class="text-xs text-gray-400 mt-1">Logs appear here when members attempt to scan the QR code.</p>
+                                <p class="text-gray-500 font-medium tracking-tight font-outfit">Tidak ada log aktivitas yang ditemukan untuk sesi ini.</p>
+                                <p class="text-xs text-gray-400 mt-1">Log akan muncul di sini ketika anggota mencoba memindai kode QR.</p>
                             </div>
                         </td>
                     </tr>

@@ -37,7 +37,7 @@ class OrganisationController extends Controller
 
         Organisation::create($request->all());
 
-        return redirect()->route('organisations.index')->with('success', 'Organisation created successfully.');
+        return redirect()->route('organisations.index')->with('success', 'Organisasi berhasil dibuat.');
     }
 
     public function edit(Request $request, Organisation $organisation)
@@ -61,7 +61,7 @@ class OrganisationController extends Controller
 
         $organisation->update($request->all());
 
-        return redirect()->route('organisations.index')->with('success', 'Organisation updated successfully.');
+        return redirect()->route('organisations.index')->with('success', 'Organisasi berhasil diperbarui.');
     }
 
     public function destroy(Request $request, Organisation $organisation)
@@ -70,6 +70,6 @@ class OrganisationController extends Controller
             abort(403);
         }
         $organisation->delete();
-        return redirect()->route('organisations.index')->with('success', 'Organisation deleted successfully.');
+        return redirect()->route('organisations.index')->with('success', 'Organisasi berhasil dihapus.');
     }
 }

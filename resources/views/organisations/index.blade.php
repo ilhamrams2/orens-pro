@@ -4,12 +4,12 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Organisations</h1>
-            <p class="text-xs sm:text-sm text-gray-500 font-medium">Manage your organisations and their settings.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 font-outfit">Organisasi</h1>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium">Kelola organisasi Anda dan pengaturannya.</p>
         </div>
         <a href="{{ route('organisations.create') }}" class="bg-orens text-white px-5 py-3 rounded-xl font-bold hover:bg-orens-light transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-orens/20 w-full sm:w-auto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Add Organisation</span>
+            <span>Tambah Organisasi</span>
         </a>
     </div>
 
@@ -24,10 +24,10 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-4 lg:px-8 py-4">Name</th>
-                        <th class="px-4 lg:px-8 py-4">Address</th>
+                        <th class="px-4 lg:px-8 py-4">Nama</th>
+                        <th class="px-4 lg:px-8 py-4">Alamat</th>
                         <th class="px-4 lg:px-8 py-4">Status</th>
-                        <th class="px-4 lg:px-8 py-4 text-right">Actions</th>
+                        <th class="px-4 lg:px-8 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -35,18 +35,18 @@
                         <tr class="hover:bg-gray-25 transition-all">
                             <td class="px-4 lg:px-8 py-5">
                                 <span class="font-bold text-gray-700 block text-sm sm:text-base">{{ $org->name }}</span>
-                                <span class="text-xs text-gray-400 font-medium">{{ $org->description ?? 'No description' }}</span>
+                                <span class="text-xs text-gray-400 font-medium">{{ $org->description ?? 'Tidak ada deskripsi' }}</span>
                             </td>
                             <td class="px-4 lg:px-8 py-5 text-xs sm:text-sm text-gray-500">{{ $org->address ?? '-' }}</td>
                             <td class="px-4 lg:px-8 py-5">
-                                <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-full border border-green-100">Active</span>
+                                <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-full border border-green-100">Aktif</span>
                             </td>
                             <td class="px-4 lg:px-8 py-5 text-right">
                                 <div class="flex justify-end gap-1 sm:gap-2">
                                     <a href="{{ route('organisations.edit', $org) }}" class="p-2 text-gray-400 hover:text-orens hover:bg-orens/5 rounded-lg transition-all">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </a>
-                                    <form action="{{ route('organisations.destroy', $org) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                    <form action="{{ route('organisations.destroy', $org) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus organisasi ini? Semua data terkait termasuk divisi dan member akan terhapus.')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
@@ -58,7 +58,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-8 py-12 text-center text-gray-400">No organisations found.</td>
+                            <td colspan="4" class="px-8 py-12 text-center text-gray-400">Organisasi tidak ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

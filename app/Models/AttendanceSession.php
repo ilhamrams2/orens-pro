@@ -66,4 +66,89 @@ class AttendanceSession extends Model
         
         return false;
     }
+
+    /**
+     * Boot the model.
+     */
+    protected static function booted()
+    {
+        static::updated(function ($session) {
+            // When a session is deactivated, fill absent members with 'alpha'
+            if ($session->wasChanged('is_active') && !$session->is_active) {
+                $session->fillAbsentMembersWithAlpha();
+            }
+        });
+    }
+
+    /**
+     * Deactivate all active sessions that have passed their end time.
+     */
+    public static function deactivateExpiredSessions()
+    {
+        $today = now()->toDateString();
+        $nowTime = now()->toTimeString();
+
+        $expiredSessions = self::where('is_active', true)
+            ->where(function($query) use ($today, $nowTime) {
+                $query->where('session_date', '<', $today)
+                      ->orWhere(function($q) use ($today, $nowTime) {
+                          $q->where('session_date', $today)
+                            ->where('end_time', '<', $nowTime);
+                      });
+            })
+            ->get();
+
+        foreach ($expiredSessions as $session) {
+            $session->update(['is_active' => false]);
+        }
+
+        // Retroactive check: ensure all inactive sessions have absent members marked as alpha
+        $inactiveSessions = self::where('is_active', false)->get();
+        foreach ($inactiveSessions as $session) {
+            $session->fillAbsentMembersWithAlpha();
+        }
+    }
+
+    /**
+     * Fill all eligible members who did not check in with 'alpha' status.
+     */
+    public function fillAbsentMembersWithAlpha()
+    {
+        // Find all members in the organisation/division
+        $membersQuery = \App\Models\User::where('role', 'member')
+            ->where('organisation_id', $this->organisation_id);
+
+        if ($this->division_id) {
+            $membersQuery->where('division_id', $this->division_id);
+        }
+
+        $memberIds = $membersQuery->pluck('id');
+
+        // Find members who already have attendance record
+        $attendedMemberIds = \App\Models\Attendance::where('session_id', $this->id)
+            ->pluck('user_id')
+            ->toArray();
+
+        // Members who are absent
+        $absentMemberIds = $memberIds->diff($attendedMemberIds);
+
+        // Insert 'alpha' records
+        $insertData = [];
+        foreach ($absentMemberIds as $memberId) {
+            $insertData[] = [
+                'session_id' => $this->id,
+                'user_id' => $memberId,
+                'status' => 'alpha',
+                'checkin_time' => null,
+                'latitude' => null,
+                'longitude' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        if (!empty($insertData)) {
+            \App\Models\Attendance::insert($insertData);
+        }
+    }
 }

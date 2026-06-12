@@ -26,15 +26,15 @@ class AttendanceService
 
         // 1. Basic Validations
         if (!$session->is_active) {
-            return $this->logAndFail($user, $session, $data, 'This session is no longer active.');
+            return $this->logAndFail($user, $session, $data, 'Sesi ini sudah tidak aktif.');
         }
 
         if ($user->role !== 'superadmin' && $session->organisation_id !== $user->organisation_id) {
-            return $this->logAndFail($user, $session, $data, 'This session is not for your organisation.');
+            return $this->logAndFail($user, $session, $data, 'Sesi ini bukan untuk organisasi Anda.');
         }
 
         if ($user->role !== 'superadmin' && $session->division_id && $session->division_id !== $user->division_id) {
-            return $this->logAndFail($user, $session, $data, 'You do not belong to this division.');
+            return $this->logAndFail($user, $session, $data, 'Anda bukan anggota divisi ini.');
         }
 
         // 2. Schedule Validation
@@ -43,28 +43,31 @@ class AttendanceService
         $endTime = Carbon::parse($session->session_date . ' ' . $session->end_time);
 
         if ($now->lt($startTime->subMinutes(30))) {
-            return $this->logAndFail($user, $session, $data, 'Check-in is not yet open. Please try again 30 minutes before.');
+            return $this->logAndFail($user, $session, $data, 'Presensi belum dibuka. Silakan coba lagi 30 menit sebelum sesi dimulai.');
         }
 
         if ($now->gt($endTime)) {
-            return $this->logAndFail($user, $session, $data, 'This session has already ended.');
+            if ($session->is_active) {
+                $session->update(['is_active' => false]);
+            }
+            return $this->logAndFail($user, $session, $data, 'Sesi ini sudah berakhir.');
         }
 
         // 3. QR Token Validation (Singapore Enterprise Standard: Dynamic Tokens)
         if (!$session->validateDynamicToken($qrToken)) {
-            return $this->logAndFail($user, $session, $data, 'Invalid or Expired QR Code. Please scan the current code.');
+            return $this->logAndFail($user, $session, $data, 'Kode QR tidak valid atau kedaluwarsa. Silakan pindai kode QR yang terbaru.');
         }
 
         // 4. GPS Geofencing Validation
         if ($session->latitude && $session->longitude) {
             if (!$lat || !$lng) {
-                return $this->logAndFail($user, $session, $data, 'GPS coordinates are required for this session.');
+                return $this->logAndFail($user, $session, $data, 'Koordinat GPS wajib dikirim untuk sesi ini.');
             }
 
             $distance = $this->calculateDistance($session->latitude, $session->longitude, $lat, $lng);
             if ($distance > ($session->radius ?? 100)) {
                 $roundedDist = round($distance);
-                return $this->logAndFail($user, $session, $data, "You are too far from the location ($roundedDist meters away).");
+                return $this->logAndFail($user, $session, $data, "Anda berada terlalu jauh dari lokasi absensi (jarak: $roundedDist meter).");
             }
         }
 
@@ -86,7 +89,7 @@ class AttendanceService
                     'qr_token' => $qrToken ?? 'N/A',
                     'latitude' => $lat,
                     'longitude' => $lng,
-                    'result' => 'Check-in successful'
+                    'result' => 'Presensi berhasil'
                 ]);
             });
         } catch (\Throwable $e) {
@@ -96,7 +99,7 @@ class AttendanceService
 
         return [
             'success' => true,
-            'message' => 'Check-in successful! Welcome to ' . $session->title
+            'message' => 'Presensi berhasil! Selamat datang di ' . $session->title
         ];
     }
 

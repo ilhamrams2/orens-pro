@@ -14,6 +14,7 @@ class AttendanceSessionController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', AttendanceSession::class);
+        AttendanceSession::deactivateExpiredSessions();
         $user = $request->user();
         $query = AttendanceSession::with(['organisation', 'division', 'creator']);
 
@@ -117,7 +118,7 @@ class AttendanceSessionController extends Controller
             return response()->json($session, 201);
         }
 
-        return redirect()->route('sessions.index')->with('success', 'Session created successfully.');
+        return redirect()->route('sessions.index')->with('success', 'Sesi presensi berhasil dibuat.');
     }
 
     public function edit(Request $request, AttendanceSession $session)
@@ -158,7 +159,7 @@ class AttendanceSessionController extends Controller
             return response()->json($session);
         }
 
-        return redirect()->route('sessions.index')->with('success', 'Session updated successfully.');
+        return redirect()->route('sessions.index')->with('success', 'Sesi presensi berhasil diperbarui.');
     }
 
     public function destroy(Request $request, AttendanceSession $session)
@@ -172,6 +173,6 @@ class AttendanceSessionController extends Controller
             return response()->json(null, 204);
         }
 
-        return redirect()->route('sessions.index')->with('success', 'Session deleted successfully.');
+        return redirect()->route('sessions.index')->with('success', 'Sesi presensi berhasil dihapus.');
     }
 }

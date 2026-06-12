@@ -6,16 +6,19 @@ use App\Models\Division;
 use App\Models\AttendanceSession;
 use App\Models\Attendance;
 use App\Models\User;
+use App\Models\Organisation;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        AttendanceSession::deactivateExpiredSessions();
+
         $user = $request->user();
         
         if ($user->role === 'superadmin') {
-            return $this->superadminStats();
+            return $this->superadminStats($request);
         } elseif ($user->role === 'pembina') {
             return $this->pembinaStats($user);
         } elseif ($user->role === 'pengurus') {
@@ -25,24 +28,53 @@ class DashboardController extends Controller
         }
     }
 
-    private function superadminStats()
+    private function superadminStats(Request $request)
     {
         $nowTime = now()->format('H:i:s');
         $today = now()->toDateString();
+        $selectedOrgId = $request->query('organisation_id');
 
-        $divisions = Division::withCount('users')->get();
-        $totalUsers = User::count();
-        $totalSessions = AttendanceSession::count();
-        $totalAttendances = Attendance::count();
+        $organisations = Organisation::all();
 
-        $activeSessionsCount = AttendanceSession::where('is_active', true)
+        $divisionsQuery = Division::withCount(['users' => function($q) use ($selectedOrgId) {
+            if ($selectedOrgId) {
+                $q->where('organisation_id', $selectedOrgId);
+            }
+        }]);
+        $usersQuery = User::query();
+        $sessionsQuery = AttendanceSession::query();
+        $attendancesQuery = Attendance::query();
+
+        if ($selectedOrgId) {
+            $divisionsQuery->where('organisation_id', $selectedOrgId);
+            $usersQuery->where('organisation_id', $selectedOrgId);
+            $sessionsQuery->where('organisation_id', $selectedOrgId);
+            $attendancesQuery->whereHas('session', function($q) use ($selectedOrgId) {
+                $q->where('organisation_id', $selectedOrgId);
+            });
+        }
+
+        $divisions = $divisionsQuery->get();
+        $totalUsers = $usersQuery->count();
+        $totalSessions = $sessionsQuery->count();
+        $totalAttendances = $attendancesQuery->count();
+
+        $activeSessionsCountQuery = AttendanceSession::where('is_active', true)
             ->where('session_date', $today)
             ->where('start_time', '<=', $nowTime)
-            ->where('end_time', '>=', $nowTime)
-            ->count();
+            ->where('end_time', '>=', $nowTime);
 
-        $divisionStats = $divisions->map(function ($division) {
-            $sessions = AttendanceSession::where('division_id', $division->id)->pluck('id');
+        if ($selectedOrgId) {
+            $activeSessionsCountQuery->where('organisation_id', $selectedOrgId);
+        }
+        $activeSessionsCount = $activeSessionsCountQuery->count();
+
+        $divisionStats = $divisions->map(function ($division) use ($selectedOrgId) {
+            $sessionsQuery = AttendanceSession::where('division_id', $division->id);
+            if ($selectedOrgId) {
+                $sessionsQuery->where('organisation_id', $selectedOrgId);
+            }
+            $sessions = $sessionsQuery->pluck('id');
             $attendancesCount = Attendance::whereIn('session_id', $sessions)->count();
             $expectedCount = $sessions->count() * $division->users_count;
             
@@ -56,7 +88,11 @@ class DashboardController extends Controller
             ];
         });
 
-        $totalExpected = AttendanceSession::all()->sum(function($session) {
+        $totalExpectedQuery = AttendanceSession::query();
+        if ($selectedOrgId) {
+            $totalExpectedQuery->where('organisation_id', $selectedOrgId);
+        }
+        $totalExpected = $totalExpectedQuery->get()->sum(function($session) {
             return User::where('organisation_id', $session->organisation_id)
                 ->where(function($q) use ($session) {
                     if ($session->division_id) $q->where('division_id', $session->division_id);
@@ -65,15 +101,52 @@ class DashboardController extends Controller
                 ->count();
         });
 
+        // 7-day Trend Data
+        $trendData = [];
+        $trendLabels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->toDateString();
+            $trendLabels[] = now()->subDays($i)->format('d M');
+
+            $dayCountQuery = Attendance::where('status', 'hadir')
+                ->whereDate('checkin_time', $date);
+
+            if ($selectedOrgId) {
+                $dayCountQuery->whereHas('session', function($q) use ($selectedOrgId) {
+                    $q->where('organisation_id', $selectedOrgId);
+                });
+            }
+
+            $trendData[] = $dayCountQuery->count();
+        }
+
+        $divisionChartLabels = [];
+        $divisionChartData = [];
+        foreach ($divisionStats as $stat) {
+            $divisionChartLabels[] = $stat['name'];
+            $divisionChartData[] = $stat['attendance_rate'];
+        }
+
+        $recentActivityQuery = AttendanceSession::with('division')->latest()->take(5);
+        if ($selectedOrgId) {
+            $recentActivityQuery->where('organisation_id', $selectedOrgId);
+        }
+
         return view('dashboard', [
-            'organisation_name' => 'Global System Administration',
+            'organisations' => $organisations,
+            'selected_organisation_id' => $selectedOrgId,
+            'organisation_name' => $selectedOrgId ? (Organisation::find($selectedOrgId)->name ?? 'Global') : 'Global System Administration',
             'total_users' => $totalUsers,
             'total_sessions' => $totalSessions,
             'total_attendances' => $totalAttendances,
             'attendance_rate' => $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 2) : 0,
             'active_sessions' => $activeSessionsCount,
             'division_stats' => $divisionStats,
-            'recent_activity' => AttendanceSession::with('division')->latest()->take(5)->get()
+            'recent_activity' => $recentActivityQuery->get(),
+            'trend_labels' => $trendLabels,
+            'trend_data' => $trendData,
+            'division_chart_labels' => $divisionChartLabels,
+            'division_chart_data' => $divisionChartData,
         ]);
     }
 
@@ -125,6 +198,27 @@ class DashboardController extends Controller
                 ->count();
         });
 
+        // 7-day Trend Data
+        $trendData = [];
+        $trendLabels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->toDateString();
+            $trendLabels[] = now()->subDays($i)->format('d M');
+            $trendData[] = Attendance::where('status', 'hadir')
+                ->whereDate('checkin_time', $date)
+                ->whereHas('session', function($q) use ($orgId) {
+                    $q->where('organisation_id', $orgId);
+                })
+                ->count();
+        }
+
+        $divisionChartLabels = [];
+        $divisionChartData = [];
+        foreach ($divisionStats as $stat) {
+            $divisionChartLabels[] = $stat['name'];
+            $divisionChartData[] = $stat['attendance_rate'];
+        }
+
         return view('dashboard', [
             'organisation_name' => $user->organisation->name ?? 'Organisation',
             'total_users' => $totalUsers,
@@ -133,7 +227,11 @@ class DashboardController extends Controller
             'attendance_rate' => $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 2) : 0,
             'active_sessions' => $activeSessionsCount,
             'division_stats' => $divisionStats,
-            'recent_activity' => AttendanceSession::where('organisation_id', $orgId)->with('division')->latest()->take(5)->get()
+            'recent_activity' => AttendanceSession::where('organisation_id', $orgId)->with('division')->latest()->take(5)->get(),
+            'trend_labels' => $trendLabels,
+            'trend_data' => $trendData,
+            'division_chart_labels' => $divisionChartLabels,
+            'division_chart_data' => $divisionChartData,
         ]);
     }
 
@@ -166,6 +264,23 @@ class DashboardController extends Controller
             ->where('end_time', '>=', $nowTime)
             ->count();
 
+        // 7-day Trend Data
+        $trendData = [];
+        $trendLabels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->toDateString();
+            $trendLabels[] = now()->subDays($i)->format('d M');
+            $trendData[] = Attendance::where('status', 'hadir')
+                ->whereDate('checkin_time', $date)
+                ->whereHas('session', function($q) use ($division) {
+                    $q->where('division_id', $division->id);
+                })
+                ->count();
+        }
+
+        $divisionChartLabels = [$division->name];
+        $divisionChartData = [$expectedCount > 0 ? round(($attendancesCount / $expectedCount) * 100, 2) : 0];
+
         return view('dashboard', [
             'organisation_name' => $user->organisation->name ?? 'Organisation',
             'division' => $division,
@@ -174,7 +289,11 @@ class DashboardController extends Controller
             'active_sessions' => $activeSessionsCount,
             'attendance_count' => $attendancesCount,
             'attendance_rate' => $expectedCount > 0 ? round(($attendancesCount / $expectedCount) * 100, 2) : 0,
-            'recent_activity' => $allSessions->take(5)
+            'recent_activity' => $allSessions->take(5),
+            'trend_labels' => $trendLabels,
+            'trend_data' => $trendData,
+            'division_chart_labels' => $divisionChartLabels,
+            'division_chart_data' => $divisionChartData,
         ]);
     }
 

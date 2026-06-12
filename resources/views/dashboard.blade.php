@@ -5,23 +5,46 @@
     <!-- Header with Identity -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-text-primary font-outfit tracking-tighter">Portal Overview</h1>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-text-primary font-outfit tracking-tighter">Ringkasan Portal</h1>
             <div class="flex flex-wrap items-center gap-2 mt-2">
                 <div class="flex items-center gap-1.5 px-2.5 py-1 bg-orens/10 rounded-full border border-orens/20">
                     <span class="w-2 h-2 rounded-full bg-orens animate-pulse"></span>
-                    <p class="text-[9px] sm:text-[10px] font-bold text-orens uppercase tracking-widest">{{ $organisation_name ?? 'Organisation' }}</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-orens uppercase tracking-widest">{{ $organisation_name ?? 'Organisasi' }}</p>
                 </div>
                 @if(auth()->user()->role === 'pengurus' && isset($division))
                     <div class="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full border border-gray-200">
-                        <p class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ $division->name }} Division</p>
+                        <p class="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest">Divisi {{ $division->name }}</p>
                     </div>
                 @endif
             </div>
         </div>
-        <div class="flex flex-row sm:flex-col items-center sm:items-end gap-2">
+        <div class="flex flex-row sm:flex-col items-center sm:items-end gap-2 shrink-0">
+            @if(auth()->user()->role === 'superadmin' && isset($organisations))
+                <div class="flex items-center gap-2 mb-1">
+                    <select id="orgFilter" onchange="filterOrganisation(this.value)" class="rounded-2xl border border-gray-200 bg-white text-xs font-bold text-gray-700 px-4 py-2.5 focus:border-orens focus:ring-orens outline-none shadow-sm transition-all hover:border-gray-300">
+                        <option value="">Semua Organisasi</option>
+                        @foreach($organisations as $org)
+                            <option value="{{ $org->id }}" {{ ($selected_organisation_id ?? '') == $org->id ? 'selected' : '' }}>
+                                {{ $org->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <script>
+                    function filterOrganisation(orgId) {
+                        const url = new URL(window.location.href);
+                        if (orgId) {
+                            url.searchParams.set('organisation_id', orgId);
+                        } else {
+                            url.searchParams.delete('organisation_id');
+                        }
+                        window.location.href = url.toString();
+                    }
+                </script>
+            @endif
             <div class="glass-card px-3 py-1.5 sm:px-4 sm:py-2 text-[9px] sm:text-[10px] font-bold text-gray-500 flex items-center gap-2 border-none bg-white shadow-sm">
                 <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500"></span>
-                <span class="hidden xs:inline">System Live:</span> {{ now()->format('d M Y') }}
+                <span class="hidden xs:inline">Sistem Aktif:</span> {{ now()->format('d M Y') }}
             </div>
             <div class="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -38,7 +61,7 @@
                 <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-4">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </div>
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Members</p>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Anggota</p>
                 <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_users ?? 0 }}</p>
             </div>
         @endif
@@ -48,7 +71,7 @@
                 <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-4">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 </div>
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Division Members</p>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Anggota Divisi</p>
                 <p class="text-3xl font-black text-gray-800 font-outfit">{{ $members_count ?? $total_members ?? 0 }}</p>
             </div>
         @endif
@@ -57,7 +80,7 @@
             <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Attendance Rate</p>
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
             <p class="text-3xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? $avg_attendance ?? 0 }}{{ is_numeric($attendance_rate ?? $avg_attendance ?? 0) ? '%' : '' }}</p>
         </div>
 
@@ -65,8 +88,33 @@
             <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             </div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Active Sessions</p>
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Sesi Aktif</p>
             <p class="text-3xl font-black text-gray-800 font-outfit">{{ $active_sessions ?? $sessions_count ?? $total_sessions ?? 0 }}</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 animate-fade-in">
+        <!-- Weekly Attendance Trend -->
+        <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden">
+            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 font-outfit">
+                <span class="w-1.5 h-5 bg-orens rounded-full"></span>
+                Tren Kehadiran Harian (7 Hari Terakhir)
+            </h3>
+            <div class="h-[280px] w-full relative">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Division Comparison Chart -->
+        <div class="bg-white p-6 sm:p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden">
+            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 font-outfit">
+                <span class="w-1.5 h-5 bg-orens rounded-full"></span>
+                Performa Kehadiran Divisi
+            </h3>
+            <div class="h-[280px] w-full relative">
+                <canvas id="divisionChart"></canvas>
+            </div>
         </div>
     </div>
     @endif
@@ -144,7 +192,7 @@
                                     <p class="text-[10px] text-gray-400 font-medium">{{ \Carbon\Carbon::parse($session->session_date)->format('d M') }} • {{ $session->start_time }}</p>
                                 </div>
                             </div>
-                            <span class="px-2 py-1 bg-blue-50 text-blue-500 rounded-lg text-[9px] font-bold uppercase tracking-tighter">Scheduled</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-500 rounded-lg text-[9px] font-bold uppercase tracking-tighter">Dijadwalkan</span>
                         </div>
                     @endforeach
                 </div>
@@ -173,7 +221,7 @@
                     <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Attendance Rate</p>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
                     <h4 class="text-4xl sm:text-5xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</h4>
                 </div>
                 <p class="text-[11px] sm:text-xs font-medium text-gray-400 mt-4 leading-relaxed italic">
@@ -189,15 +237,15 @@
     <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-6 sm:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <h3 class="text-lg sm:text-xl font-bold text-gray-800">
-                {{ auth()->user()->role === 'member' ? 'My Recent Attendance' : 'Recent Activity' }}
+                {{ auth()->user()->role === 'member' ? 'Kehadiran Terakhir Saya' : 'Aktivitas Terbaru' }}
             </h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-25 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                        <th class="px-4 lg:px-8 py-4">{{ auth()->user()->role === 'member' ? 'Session' : 'User/Session' }}</th>
-                        <th class="px-4 lg:px-8 py-4">Date</th>
+                        <th class="px-4 lg:px-8 py-4">{{ auth()->user()->role === 'member' ? 'Sesi' : 'Pengguna/Sesi' }}</th>
+                        <th class="px-4 lg:px-8 py-4">Tanggal</th>
                         <th class="px-4 lg:px-8 py-4">Status</th>
                     </tr>
                 </thead>
@@ -208,7 +256,7 @@
                             $title = $isAttendance ? ($item->session?->title ?? 'Untitled') : ($item->title ?? 'Untitled');
                             $date = $isAttendance ? ($item->session?->session_date ?? '-') : ($item->session_date ?? '-');
                             $subtext = $isAttendance ? ($item->session?->start_time ?? '') : ($item->division?->name ?? 'Global');
-                            $status = $isAttendance ? ($item->status) : ($item->is_active ? 'active' : 'inactive');
+                            $status = $isAttendance ? ($item->status) : ($item->is_active ? 'active' : 'selesai');
                         @endphp
                         <tr class="hover:bg-gray-25 transition-all">
                             <td class="px-4 lg:px-8 py-4">
@@ -228,16 +276,17 @@
                             <td class="px-4 lg:px-8 py-5">
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase border border-current/10
                                     {{ in_array($status, ['hadir', 'completed', 'active']) ? 'bg-green-50 text-green-600' : '' }}
+                                    {{ $status === 'selesai' ? 'bg-gray-100 text-gray-500 border-gray-200' : '' }}
                                     {{ $status === 'sakit' ? 'bg-blue-50 text-blue-600' : '' }}
                                     {{ $status === 'izin' ? 'bg-yellow-50 text-yellow-600' : '' }}
                                     {{ in_array($status, ['alpha', 'inactive']) ? 'bg-red-50 text-red-600' : '' }}">
-                                    {{ $status }}
+                                    {{ $status === 'hadir' ? 'Hadir' : ($status === 'sakit' ? 'Sakit' : ($status === 'izin' ? 'Izin' : ($status === 'alpha' ? 'Alpa' : ($status === 'active' ? 'Aktif' : ($status === 'selesai' ? 'Selesai' : $status))))) }}
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-8 py-12 text-center text-gray-400">No recent activity.</td>
+                            <td colspan="3" class="px-8 py-12 text-center text-gray-400">Tidak ada aktivitas terbaru.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -260,8 +309,8 @@
         <div class="bg-white rounded-[40px] shadow-2xl max-w-lg w-full overflow-hidden relative">
             <div class="p-8 border-b border-gray-50 flex items-center justify-between">
                 <div>
-                    <h3 class="text-xl font-black text-gray-800 font-outfit" id="scannerTitle">Scan QR Code</h3>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Authenticating Location...</p>
+                    <h3 class="text-xl font-black text-gray-800 font-outfit" id="scannerTitle">Pindai Kode QR</h3>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Memverifikasi Lokasi...</p>
                 </div>
                 <button onclick="closeScanner()" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -276,7 +325,7 @@
                 </p>
                 <div id="gpsStatus" class="mt-4 flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400">
                     <span class="w-2 h-2 rounded-full bg-gray-300"></span>
-                    Waiting for GPS...
+                    Menunggu GPS...
                 </div>
             </div>
         </div>
@@ -377,4 +426,88 @@
             userCoords = null;
         }
     </script>
+
+    @if(auth()->user()->role !== 'member')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Line Chart (Trend)
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: @json($trend_labels ?? []),
+                    datasets: [{
+                        label: 'Jumlah Kehadiran',
+                        data: @json($trend_data ?? []),
+                        borderColor: '#FF6B00',
+                        backgroundColor: 'rgba(255, 107, 0, 0.05)',
+                        borderWidth: 3.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#FF6B00',
+                        pointBorderColor: '#FFF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
+                            grid: { color: '#F3F4F6' }
+                        },
+                        x: {
+                            ticks: { color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart (Division Performance)
+            const divCtx = document.getElementById('divisionChart').getContext('2d');
+            new Chart(divCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($division_chart_labels ?? []),
+                    datasets: [{
+                        label: 'Persentase Kehadiran (%)',
+                        data: @json($division_chart_data ?? []),
+                        backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                        hoverBackgroundColor: '#3B82F6',
+                        borderRadius: 12,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: value => value + '%', color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
+                            grid: { color: '#F3F4F6' }
+                        },
+                        x: {
+                            ticks: { color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    @endif
 @endsection

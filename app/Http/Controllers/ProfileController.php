@@ -26,7 +26,7 @@ class ProfileController extends Controller
                     $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
                     $domain = substr(strrchr($value, "@"), 1);
                     if (!in_array($domain, $allowedDomains)) {
-                        $fail('The email must belong to a prestasiprima domain (@smkprestasiprima.sch.id or @smaprestasiprima.sch.id).');
+                        $fail('Email harus menggunakan domain prestasiprima (@smkprestasiprima.sch.id atau @smaprestasiprima.sch.id).');
                     }
                 },
             ],
@@ -44,6 +44,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully!');
+        return back()->with('success', 'Profil berhasil diperbarui!');
     }
 }

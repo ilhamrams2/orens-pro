@@ -114,7 +114,7 @@ class AttendanceController extends Controller
             );
         }
 
-        return redirect()->route('sessions.index')->with('success', 'Attendance marked successfully.');
+        return redirect()->route('sessions.index')->with('success', 'Kehadiran berhasil dicatat.');
     }
 
     public function selfCheckIn(Request $request, AttendanceSession $session)
@@ -140,7 +140,7 @@ class AttendanceController extends Controller
         $sessionIds = $request->input('session_ids', []);
 
         if (empty($sessionIds)) {
-            return back()->with('error', 'Please select at least one session.');
+            return back()->with('error', 'Silakan pilih minimal satu sesi.');
         }
 
         $sessions = AttendanceSession::whereIn('id', $sessionIds)
@@ -170,6 +170,8 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
+        AttendanceSession::deactivateExpiredSessions();
+
         $attendances = Attendance::with(['session'])
             ->where('user_id', $request->user()->id)
             ->latest()

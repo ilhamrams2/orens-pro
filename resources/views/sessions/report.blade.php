@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report - {{ $session->title }}</title>
+    <title>Laporan - {{ $session->title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -20,11 +20,11 @@
         <div class="flex justify-between items-start border-b border-gray-100 pb-8 mb-8">
             <div>
                 <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">{{ $session->organisation->name ?? 'Orens Pro' }}</h1>
-                <p class="text-gray-500 font-medium text-sm mt-1">Attendance Report Summary</p>
+                <p class="text-gray-500 font-medium text-sm mt-1">Ringkasan Laporan Kehadiran</p>
             </div>
             <div class="text-right">
                 <div class="inline-flex items-center gap-2 px-3 py-1 bg-orange-50 text-orens rounded-full text-[10px] font-bold uppercase tracking-wider mb-2" style="color: #FF6B00;">
-                    Official Report
+                    Laporan Resmi
                 </div>
                 <p class="text-xs text-gray-400 font-medium">{{ now()->format('d M Y, H:i') }}</p>
             </div>
@@ -33,12 +33,12 @@
         <!-- Session Details -->
         <div class="grid grid-cols-2 gap-8 mb-12">
             <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Session Title</label>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Judul Sesi</label>
                 <p class="text-lg font-bold text-gray-800">{{ $session->title }}</p>
-                <p class="text-sm text-gray-500 font-medium mt-1">{{ $session->division->name ?? 'Global Division' }}</p>
+                <p class="text-sm text-gray-500 font-medium mt-1">{{ $session->division->name ?? 'Divisi Global' }}</p>
             </div>
             <div class="text-right">
-                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Schedule</label>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Jadwal</label>
                 <p class="text-lg font-bold text-gray-800">{{ \Carbon\Carbon::parse($session->session_date)->format('d F Y') }}</p>
                 <p class="text-sm text-gray-500 font-medium mt-1">{{ $session->start_time }} - {{ $session->end_time }}</p>
             </div>
@@ -48,10 +48,10 @@
         <div class="grid grid-cols-4 gap-4 mb-12">
             @php
                 $tags = [
-                    'hadir' => ['label' => 'Total Present', 'color' => 'bg-green-50 text-green-600'],
+                    'hadir' => ['label' => 'Total Hadir', 'color' => 'bg-green-50 text-green-600'],
                     'sakit' => ['label' => 'Sakit', 'color' => 'bg-blue-50 text-blue-600'],
                     'izin' => ['label' => 'Izin', 'color' => 'bg-yellow-50 text-yellow-600'],
-                    'alpha' => ['label' => 'Alpha', 'color' => 'bg-red-50 text-red-600'],
+                    'alpha' => ['label' => 'Alpa', 'color' => 'bg-red-50 text-red-600'],
                 ];
             @endphp
             @foreach($tags as $status => $meta)
@@ -67,10 +67,10 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-100">
-                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Member Name</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nama Anggota</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email</th>
                         <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Check-in Time</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Waktu Presensi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 text-sm">
@@ -81,7 +81,7 @@
                             <td class="px-6 py-4 text-gray-500">{{ $member->email }}</td>
                             <td class="px-6 py-4">
                                 <span class="capitalize font-bold {{ ($att->status ?? 'alpha') === 'hadir' ? 'text-green-500' : ( ($att->status ?? 'alpha') === 'alpha' ? 'text-red-500' : 'text-orange-500' ) }}">
-                                    {{ $att->status ?? 'Alpha' }}
+                                    {{ ($att->status ?? 'alpha') === 'alpha' ? 'Alpa' : ($att->status ?? 'Alpa') }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-gray-400 font-medium">
@@ -95,13 +95,13 @@
 
         <!-- Footer -->
         <div class="border-t border-gray-100 pt-8 flex justify-between items-center bg-gray-50/50 -mx-8 -mb-8 p-8 mt-auto">
-            <p class="text-[10px] text-gray-400 font-medium">Generated by Orens Pro Management System</p>
+            <p class="text-[10px] text-gray-400 font-medium">Dibuat oleh Sistem Manajemen Orens Pro</p>
             <div class="flex gap-4 no-print">
                 <button onclick="window.print()" class="px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-200">
-                    Print Report / Save as PDF
+                    Cetak Laporan / Simpan Sebagai PDF
                 </button>
                 <a href="{{ route('sessions.index') }}" class="px-6 py-3 bg-white text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all">
-                    Back to List
+                    Kembali ke Daftar
                 </a>
             </div>
         </div>

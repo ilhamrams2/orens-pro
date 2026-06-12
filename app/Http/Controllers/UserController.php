@@ -141,7 +141,7 @@ class UserController extends Controller
                     $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
                     $domain = substr(strrchr($value, "@"), 1);
                     if (!in_array($domain, $allowedDomains)) {
-                        $fail('The email must belong to a prestasiprima domain (@smkprestasiprima.sch.id or @smaprestasiprima.sch.id).');
+                        $fail('Email harus menggunakan domain prestasiprima (@smkprestasiprima.sch.id atau @smaprestasiprima.sch.id).');
                     }
                 },
             ],
@@ -153,8 +153,8 @@ class UserController extends Controller
             $rules['organisation_id'] = 'required|in:'.$user->organisation_id;
             $rules['division_id'] = 'nullable|exists:divisions,id';
         } elseif ($user->role === 'superadmin') {
-            $rules['role'] = 'required|in:pembina,pengurus,member';
-            $rules['organisation_id'] = 'required|exists:organisations,id';
+            $rules['role'] = 'required|in:superadmin,pembina,pengurus,member';
+            $rules['organisation_id'] = $request->role === 'superadmin' ? 'nullable' : 'required|exists:organisations,id';
             $rules['division_id'] = 'nullable|exists:divisions,id';
         }
 
@@ -172,13 +172,13 @@ class UserController extends Controller
             $data['division_id'] = $request->division_id;
         } else {
             $data['role'] = $request->role;
-            $data['organisation_id'] = $request->organisation_id;
-            $data['division_id'] = $request->division_id;
+            $data['organisation_id'] = $request->role === 'superadmin' ? null : $request->organisation_id;
+            $data['division_id'] = $request->role === 'superadmin' ? null : $request->division_id;
         }
 
         User::create($data);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
     public function edit(Request $request, User $user)
@@ -217,7 +217,7 @@ class UserController extends Controller
                     $allowedDomains = ['smkprestasiprima.sch.id', 'smaprestasiprima.sch.id'];
                     $domain = substr(strrchr($value, "@"), 1);
                     if (!in_array($domain, $allowedDomains)) {
-                        $fail('The email must belong to a prestasiprima domain (@smkprestasiprima.sch.id or @smaprestasiprima.sch.id).');
+                        $fail('Email harus menggunakan domain prestasiprima (@smkprestasiprima.sch.id atau @smaprestasiprima.sch.id).');
                     }
                 },
             ],
@@ -229,8 +229,8 @@ class UserController extends Controller
             $rules['organisation_id'] = 'required|in:'.$authUser->organisation_id;
             $rules['division_id'] = 'nullable|exists:divisions,id';
         } elseif ($authUser->role === 'superadmin') {
-            $rules['role'] = 'required|in:pembina,pengurus,member';
-            $rules['organisation_id'] = 'required|exists:organisations,id';
+            $rules['role'] = 'required|in:superadmin,pembina,pengurus,member';
+            $rules['organisation_id'] = $request->role === 'superadmin' ? 'nullable' : 'required|exists:organisations,id';
             $rules['division_id'] = 'nullable|exists:divisions,id';
         }
 
@@ -247,8 +247,8 @@ class UserController extends Controller
             $data['division_id'] = $request->division_id;
         } elseif ($authUser->role === 'superadmin') {
             $data['role'] = $request->role;
-            $data['organisation_id'] = $request->organisation_id;
-            $data['division_id'] = $request->division_id;
+            $data['organisation_id'] = $request->role === 'superadmin' ? null : $request->organisation_id;
+            $data['division_id'] = $request->role === 'superadmin' ? null : $request->division_id;
         }
 
         if ($request->filled('password')) {
@@ -257,7 +257,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     public function destroy(Request $request, User $user)
@@ -270,11 +270,11 @@ class UserController extends Controller
         }
 
         if ($user->id === $authUser->id) {
-            return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
+            return redirect()->route('users.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 
     public function importCsv(Request $request)

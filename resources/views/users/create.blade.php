@@ -5,10 +5,10 @@
     <div class="mb-8">
         <a href="{{ route('users.index') }}" class="text-gray-400 hover:text-orens flex items-center gap-2 text-sm font-bold transition-all mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            Back to List
+            Kembali ke Daftar
         </a>
-        <h1 class="text-3xl font-bold text-gray-800">{{ isset($user) ? 'Edit' : 'Add' }} User</h1>
-        <p class="text-gray-500">Configure user credentials and permissions.</p>
+        <h1 class="text-3xl font-bold text-gray-800">{{ isset($user) ? 'Edit' : 'Tambah' }} Pengguna</h1>
+        <p class="text-gray-500">Konfigurasi kredensial dan hak akses pengguna.</p>
     </div>
 
     <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
@@ -19,14 +19,14 @@
             <div class="space-y-6">
                 <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
                         <input type="text" name="name" value="{{ old('name', $user->name ?? '') }}" required
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all"
-                            placeholder="Full Name">
+                            placeholder="Nama Lengkap">
                         @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Email Domain</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Domain Email</label>
                         <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" required
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all"
                             placeholder="user@smkprestasiprima.sch.id">
@@ -35,7 +35,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Password {{ isset($user) ? '(Leave blank to keep current)' : '' }}</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Kata Sandi {{ isset($user) ? '(Biarkan kosong jika tidak ingin diubah)' : '' }}</label>
                     <input type="password" name="password" {{ isset($user) ? '' : 'required' }}
                         class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all"
                         placeholder="••••••••">
@@ -45,17 +45,20 @@
                 <div class="grid grid-cols-2 gap-6">
                     @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Role</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Peran</label>
                         <select name="role" required
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all">
                             <option value="member" {{ old('role', $user->role ?? '') === 'member' ? 'selected' : '' }}>Member</option>
                             <option value="pengurus" {{ old('role', $user->role ?? '') === 'pengurus' ? 'selected' : '' }}>Pengurus</option>
                             <option value="pembina" {{ old('role', $user->role ?? '') === 'pembina' ? 'selected' : '' }}>Pembina</option>
+                            @if(auth()->user()->role === 'superadmin')
+                                <option value="superadmin" {{ old('role', $user->role ?? '') === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                            @endif
                         </select>
                         @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Organisation</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Organisasi</label>
                         <select name="organisation_id" required
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all">
                             @foreach($organisations as $org)
@@ -69,11 +72,11 @@
                     @else
                     <div class="col-span-2 bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Division</p>
-                            <p class="text-sm font-bold text-gray-700">{{ auth()->user()->division->name ?? 'Your Division' }}</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Divisi Target</p>
+                            <p class="text-sm font-bold text-gray-700">{{ auth()->user()->division->name ?? 'Divisi Anda' }}</p>
                         </div>
                         <div class="px-3 py-1 bg-orens/10 text-orens rounded-full text-[10px] font-bold uppercase">
-                            Member Account
+                            Akun Anggota
                         </div>
                     </div>
                     @endif
@@ -81,10 +84,10 @@
 
                 @if(in_array(auth()->user()->role, ['pembina', 'superadmin']))
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Division (Optional)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Divisi (Opsional)</label>
                     <select name="division_id"
                         class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all">
-                        <option value="">No Division</option>
+                        <option value="">Tanpa Divisi</option>
                         @foreach($divisions as $div)
                             <option value="{{ $div->id }}" {{ old('division_id', $user->division_id ?? '') == $div->id ? 'selected' : '' }}>
                                 {{ $div->name }} ({{ $div->organisation->name }})
@@ -97,11 +100,41 @@
 
                 <div class="pt-4">
                     <button type="submit" class="w-full bg-orens text-white p-4 rounded-xl font-bold hover:bg-orens-light transition-all shadow-lg shadow-orens/20">
-                        {{ isset($user) ? 'Update' : 'Create' }} User Account
+                        {{ isset($user) ? 'Perbarui' : 'Buat' }} Akun Pengguna
                     </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.querySelector('select[name="role"]');
+        const orgSelect = document.querySelector('select[name="organisation_id"]');
+        const divSelect = document.querySelector('select[name="division_id"]');
+
+        if (roleSelect && orgSelect) {
+            const toggleRequired = () => {
+                if (roleSelect.value === 'superadmin') {
+                    orgSelect.removeAttribute('required');
+                    orgSelect.disabled = true;
+                    orgSelect.value = '';
+                    if (divSelect) {
+                        divSelect.disabled = true;
+                        divSelect.value = '';
+                    }
+                } else {
+                    orgSelect.setAttribute('required', 'required');
+                    orgSelect.disabled = false;
+                    if (divSelect) {
+                        divSelect.disabled = false;
+                    }
+                }
+            };
+            roleSelect.addEventListener('change', toggleRequired);
+            toggleRequired(); // Run initially
+        }
+    });
+</script>
 @endsection
