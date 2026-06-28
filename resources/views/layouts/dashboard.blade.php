@@ -10,6 +10,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .sidebar-item-active {
             background: rgba(255, 107, 0, 0.1);
@@ -164,28 +165,7 @@
         </main>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-4"></div>
 
-    <template id="toast-template">
-        <div class="toast-item transform translate-y-4 opacity-0 transition-all duration-500 bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 flex items-center gap-4 min-w-[320px] max-w-md">
-            <div class="toast-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0"></div>
-            <div class="flex-1">
-                <p class="toast-title text-sm font-bold text-gray-800"></p>
-                <p class="toast-message text-xs text-gray-500 font-medium mt-0.5"></p>
-            </div>
-            <button class="toast-close text-gray-400 hover:text-gray-600 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        </div>
-    </template>
-
-    <style>
-        .toast-item.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    </style>
 
     <script>
         const sidebar = document.getElementById('sidebar');
@@ -222,39 +202,27 @@
             }
         });
 
-        function showToast(type, title, message) {
-            const container = document.getElementById('toast-container');
-            const template = document.getElementById('toast-template');
-            const toast = template.content.cloneNode(true).querySelector('.toast-item');
-            
-            const iconContainer = toast.querySelector('.toast-icon');
-            const titleEl = toast.querySelector('.toast-title');
-            const messageEl = toast.querySelector('.toast-message');
-            const closeBtn = toast.querySelector('.toast-close');
-
-            titleEl.textContent = title;
-            messageEl.textContent = message;
-
-            if (type === 'success') {
-                iconContainer.classList.add('bg-green-50', 'text-green-500');
-                iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
-            } else {
-                iconContainer.classList.add('bg-red-50', 'text-red-500');
-                iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>';
+        // SweetAlert2 Toast Mixin
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
             }
+        });
 
-            container.appendChild(toast);
-            
-            // Trigger animation
-            requestAnimationFrame(() => toast.classList.add('show'));
-
-            const remove = () => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 500);
-            };
-
-            closeBtn.onclick = remove;
-            setTimeout(remove, 5000);
+        function showToast(type, title, message) {
+            Toast.fire({
+                icon: type,
+                title: message,
+                customClass: {
+                    popup: 'rounded-2xl border border-gray-100 shadow-xl'
+                }
+            });
         }
 
         const successMsg = @json(session('success'));
@@ -267,6 +235,58 @@
         if (errorMsg) {
             showToast('error', 'Gagal!', errorMsg);
         }
+
+        // Override Native window.alert
+        window.alert = function(message) {
+            Swal.fire({
+                title: 'Informasi',
+                text: message,
+                icon: 'info',
+                confirmButtonColor: '#FF6B00',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-[32px]'
+                }
+            });
+        };
+
+        // Intercept Native confirm() on forms
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
+                const confirmAttr = form.getAttribute('onsubmit');
+                const match = confirmAttr ? confirmAttr.match(/confirm\(['"](.+?)['"]\)/) : null;
+                const message = match ? match[1] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+                
+                // Remove the native onsubmit attribute so it doesn't trigger the browser alert
+                form.removeAttribute('onsubmit');
+                
+                // Add SweetAlert2 confirmation
+                form.addEventListener('submit', function(e) {
+                    if (form.dataset.confirmed) {
+                        return; // submit normally
+                    }
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Konfirmasi Tindakan',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#FF6B00',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal',
+                        customClass: {
+                            popup: 'rounded-[32px]'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.dataset.confirmed = 'true';
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
