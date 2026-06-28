@@ -13,6 +13,24 @@
 
         <form action="{{ url('/login') }}" method="POST" class="space-y-6">
             @csrf
+            
+            @if ($errors->any())
+                <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 text-sm flex items-start gap-3 mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 shrink-0 text-red-500">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <div>
+                        <span class="font-bold block mb-1">Gagal Masuk</span>
+                        <ul class="list-disc list-inside space-y-0.5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
             <div>
                 <label class="block text-sm font-bold mb-2.5 text-text-primary ml-1">Alamat Email</label>
                 <input type="email" name="email" value="{{ old('email') }}" required 

@@ -133,6 +133,7 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', [
+            'title' => 'Dashboard',
             'organisations' => $organisations,
             'selected_organisation_id' => $selectedOrgId,
             'organisation_name' => $selectedOrgId ? (Organisation::find($selectedOrgId)->name ?? 'Global') : 'Global System Administration',
@@ -220,6 +221,7 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', [
+            'title' => 'Dashboard',
             'organisation_name' => $user->organisation->name ?? 'Organisation',
             'total_users' => $totalUsers,
             'total_sessions' => $totalSessions,
@@ -282,6 +284,7 @@ class DashboardController extends Controller
         $divisionChartData = [$expectedCount > 0 ? round(($attendancesCount / $expectedCount) * 100, 2) : 0];
 
         return view('dashboard', [
+            'title' => 'Dashboard',
             'organisation_name' => $user->organisation->name ?? 'Organisation',
             'division' => $division,
             'members_count' => $membersCount,
@@ -317,6 +320,7 @@ class DashboardController extends Controller
         $eligibleSessionsCount = $baseQuery->count();
 
         return view('dashboard', [
+            'title' => 'Dashboard',
             'organisation_name' => $user->organisation->name ?? 'Organisation',
             'total_join' => $totalJoin,
             'attendance_rate' => $eligibleSessionsCount > 0 ? round(($totalJoin / $eligibleSessionsCount) * 100, 2) : 0,

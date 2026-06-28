@@ -1,17 +1,19 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="max-w-2xl mx-auto py-8">
-    <div class="mb-8">
-        <a href="{{ route('sessions.index') }}" class="text-gray-400 hover:text-orens flex items-center gap-2 text-sm font-bold transition-all mb-4">
+<div class="space-y-6">
+    <div class="flex flex-col gap-2">
+        <a href="{{ route('sessions.index') }}" class="text-gray-400 hover:text-orens flex items-center gap-2 text-sm font-bold transition-all w-fit">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Kembali ke Daftar
         </a>
-        <h1 class="text-3xl font-bold text-gray-800">{{ isset($session) ? 'Ubah' : 'Buat' }} Sesi</h1>
-        <p class="text-gray-500">Tentukan jadwal dan divisi untuk sesi presensi ini.</p>
+        <x-ui.header :title="(isset($session) ? 'Ubah' : 'Buat') . ' Sesi'" subtitle="Tentukan jadwal dan divisi untuk sesi presensi ini." />
     </div>
 
-    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Form Column -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
         <form action="{{ isset($session) ? route('sessions.update', $session) : route('sessions.store') }}" method="POST">
             @csrf
             @if(isset($session)) @method('PUT') @endif
@@ -137,6 +139,59 @@
                 </div>
             </div>
         </form>
+            </div>
+        </div>
+
+        <!-- Info / Quotes Column -->
+        <div class="space-y-6">
+            <!-- Card 1: Motivational Quotes -->
+            <div class="bg-orens text-white p-8 rounded-[32px] shadow-xl shadow-orens/10 relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
+                <div class="absolute -left-10 -top-10 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700"></div>
+                
+                <div class="relative z-10 space-y-4">
+                    <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </span>
+                    <h3 class="text-base font-bold font-outfit uppercase tracking-wider">Inspirasi Harian</h3>
+                    <p class="text-sm font-medium leading-relaxed opacity-95 italic">
+                        "Kedisiplinan bukanlah pembatasan kebebasan, melainkan fondasi utama untuk membangun integritas dan mencapai kesuksesan yang berkelanjutan."
+                    </p>
+                    <p class="text-xs font-bold text-white/80 text-right">— Orens Pro Team</p>
+                </div>
+            </div>
+
+            <!-- Card 2: Quick tips/information -->
+            <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
+                <h3 class="text-base font-bold text-gray-800 flex items-center gap-2 font-outfit">
+                    <span class="w-1.5 h-5 bg-orens rounded-full"></span>
+                    Panduan Presensi
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-xl bg-orange-50 text-orens flex items-center justify-center shrink-0 font-bold text-xs">1</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-700">Penentuan Koordinat</h4>
+                            <p class="text-[11px] text-gray-400 font-medium leading-relaxed mt-0.5">Disarankan menggunakan GPS perangkat saat berada langsung di lokasi latihan ekskul untuk akurasi optimal.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-xl bg-orange-50 text-orens flex items-center justify-center shrink-0 font-bold text-xs">2</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-700">Radius Aman</h4>
+                            <p class="text-[11px] text-gray-400 font-medium leading-relaxed mt-0.5">Atur radius 50-100 meter untuk memberikan toleransi jika sensor GPS perangkat siswa mengalami pergeseran titik koordinat.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-xl bg-orange-50 text-orens flex items-center justify-center shrink-0 font-bold text-xs">3</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-700">Sesi Otomatis</h4>
+                            <p class="text-[11px] text-gray-400 font-medium leading-relaxed mt-0.5">Siswa yang tidak melakukan check-in mandiri setelah waktu berakhir akan otomatis ditandai Alpha oleh sistem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
