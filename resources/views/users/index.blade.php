@@ -67,6 +67,105 @@
         </div>
     @endif
 
+    <!-- Filters Bar: Primary Eskul Filter & Secondary Role Sub-Tabs -->
+    <div class="bg-white rounded-[28px] border border-gray-100 p-5 shadow-sm space-y-4 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orens/10 text-orens rounded-2xl flex items-center justify-center font-bold shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Filter Eskul / Divisi</h4>
+                    <p class="text-sm font-bold text-gray-800 font-outfit">
+                        {{ $selectedDivisionId ? ($divisions->firstWhere('id', $selectedDivisionId)->name ?? 'Divisi') : 'Semua Eskul & Divisi' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                @if(auth()->user()->role === 'superadmin' && isset($organisations))
+                    <select id="orgFilterSelect" onchange="filterOrg(this.value)" class="rounded-2xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700 px-4 py-2.5 focus:border-orens focus:ring-orens outline-none shadow-sm transition-all hover:bg-white">
+                        <option value="">Semua Organisasi</option>
+                        @foreach($organisations as $org)
+                            <option value="{{ $org->id }}" {{ ($selectedOrgId ?? '') == $org->id ? 'selected' : '' }}>
+                                {{ $org->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                @endif
+
+                <select id="divisionFilterSelect" onchange="filterDivision(this.value)" class="rounded-2xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700 px-4 py-2.5 focus:border-orens focus:ring-orens outline-none shadow-sm transition-all hover:bg-white min-w-[200px]">
+                    <option value="">Semua Eskul / Divisi</option>
+                    @foreach($divisions as $div)
+                        <option value="{{ $div->id }}" {{ ($selectedDivisionId ?? '') == $div->id ? 'selected' : '' }}>
+                            {{ $div->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <!-- Role Sub-Tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2 shrink-0">Sub Role:</span>
+            
+            <a href="{{ route('users.index', array_merge(request()->except('role'), [])) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border flex items-center gap-2 {{ empty($selectedRole) ? 'bg-orens text-white border-orens shadow-md shadow-orens/20' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100' }}">
+                <span>Semua</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ empty($selectedRole) ? 'bg-white/20 text-white' : 'bg-white text-gray-500 border border-gray-200' }}">{{ $totalCount ?? 0 }}</span>
+            </a>
+
+            <a href="{{ route('users.index', array_merge(request()->query(), ['role' => 'member'])) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border flex items-center gap-2 {{ $selectedRole === 'member' ? 'bg-orens text-white border-orens shadow-md shadow-orens/20' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100' }}">
+                <span>Anggota / Member</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ $selectedRole === 'member' ? 'bg-white/20 text-white' : 'bg-white text-gray-500 border border-gray-200' }}">{{ $memberCount ?? 0 }}</span>
+            </a>
+
+            <a href="{{ route('users.index', array_merge(request()->query(), ['role' => 'pengurus'])) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border flex items-center gap-2 {{ $selectedRole === 'pengurus' ? 'bg-orens text-white border-orens shadow-md shadow-orens/20' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100' }}">
+                <span>Pengurus</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ $selectedRole === 'pengurus' ? 'bg-white/20 text-white' : 'bg-white text-gray-500 border border-gray-200' }}">{{ $pengurusCount ?? 0 }}</span>
+            </a>
+
+            <a href="{{ route('users.index', array_merge(request()->query(), ['role' => 'pembina'])) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border flex items-center gap-2 {{ $selectedRole === 'pembina' ? 'bg-orens text-white border-orens shadow-md shadow-orens/20' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100' }}">
+                <span>Pembina</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ $selectedRole === 'pembina' ? 'bg-white/20 text-white' : 'bg-white text-gray-500 border border-gray-200' }}">{{ $pembinaCount ?? 0 }}</span>
+            </a>
+
+            @if(auth()->user()->role === 'superadmin')
+            <a href="{{ route('users.index', array_merge(request()->query(), ['role' => 'superadmin'])) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border flex items-center gap-2 {{ $selectedRole === 'superadmin' ? 'bg-orens text-white border-orens shadow-md shadow-orens/20' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100' }}">
+                <span>Super Admin</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] {{ $selectedRole === 'superadmin' ? 'bg-white/20 text-white' : 'bg-white text-gray-500 border border-gray-200' }}">{{ $superadminCount ?? 0 }}</span>
+            </a>
+            @endif
+        </div>
+    </div>
+
+    <script>
+        function filterDivision(divisionId) {
+            const url = new URL(window.location.href);
+            if (divisionId) {
+                url.searchParams.set('division_id', divisionId);
+            } else {
+                url.searchParams.delete('division_id');
+            }
+            window.location.href = url.toString();
+        }
+
+        function filterOrg(orgId) {
+            const url = new URL(window.location.href);
+            if (orgId) {
+                url.searchParams.set('organisation_id', orgId);
+            } else {
+                url.searchParams.delete('organisation_id');
+            }
+            url.searchParams.delete('division_id');
+            window.location.href = url.toString();
+        }
+    </script>
+
     <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left">

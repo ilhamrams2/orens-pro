@@ -31,7 +31,8 @@ class AttendanceSessionController extends Controller
             return response()->json($sessions);
         }
 
-        return view('sessions.index', compact('sessions'));
+        $title = 'Sesi Presensi';
+        return view('sessions.index', compact('title', 'sessions'));
     }
 
     /**
@@ -74,7 +75,8 @@ class AttendanceSessionController extends Controller
             $divisions = $divisions->get();
         }
         
-        return view('sessions.create', compact('organisations', 'divisions'));
+        $title = 'Buat Sesi Presensi';
+        return view('sessions.create', compact('title', 'organisations', 'divisions'));
     }
 
     public function store(Request $request)
@@ -134,7 +136,8 @@ class AttendanceSessionController extends Controller
             $divisions = Division::where('organisation_id', $user->organisation_id)->get();
         }
 
-        return view('sessions.edit', compact('session', 'organisations', 'divisions'));
+        $title = 'Edit Sesi Presensi';
+        return view('sessions.edit', compact('title', 'session', 'organisations', 'divisions'));
     }
 
     public function update(Request $request, AttendanceSession $session)

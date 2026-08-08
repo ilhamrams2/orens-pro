@@ -177,6 +177,7 @@ class AttendanceController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('attendance.index', compact('attendances'));
+        $title = 'Riwayat Presensi';
+        return view('attendance.index', compact('title', 'attendances'));
     }
 }

@@ -15,8 +15,47 @@ class UserController extends Controller
     {
         $user = $request->user();
         $lastResetAt = $user->organisation?->last_grade_reset_at;
+        $selectedOrgId = $request->query('organisation_id');
+        $selectedDivisionId = $request->query('division_id');
+        $selectedRole = $request->query('role');
 
-        $query = User::with(['organisation', 'division'])
+        $organisations = Organisation::all();
+
+        // Division query for Eskul dropdown/filter
+        $divisionsQuery = Division::query();
+        if ($user->role === 'pembina' || $user->role === 'pengurus') {
+            $divisionsQuery->where('organisation_id', $user->organisation_id);
+        } elseif ($selectedOrgId) {
+            $divisionsQuery->where('organisation_id', $selectedOrgId);
+        }
+        $divisions = $divisionsQuery->get();
+
+        $baseQuery = User::where('id', '!=', $user->id);
+
+        if ($user->role === 'pembina' || $user->role === 'pengurus') {
+            $baseQuery->where('organisation_id', $user->organisation_id);
+        } elseif ($selectedOrgId) {
+            $baseQuery->where('organisation_id', $selectedOrgId);
+        }
+
+        // Apply Eskul/Division filter if selected
+        if ($selectedDivisionId) {
+            if ($selectedDivisionId === 'none') {
+                $baseQuery->whereNull('division_id');
+            } else {
+                $baseQuery->where('division_id', $selectedDivisionId);
+            }
+        }
+
+        // Role counts for sub-tabs under selected Eskul
+        $totalCount = (clone $baseQuery)->count();
+        $memberCount = (clone $baseQuery)->where('role', 'member')->count();
+        $pengurusCount = (clone $baseQuery)->where('role', 'pengurus')->count();
+        $pembinaCount = (clone $baseQuery)->where('role', 'pembina')->count();
+        $superadminCount = (clone $baseQuery)->where('role', 'superadmin')->count();
+
+        $query = (clone $baseQuery)
+            ->with(['organisation', 'division'])
             ->withCount(['attendances' => function($q) use ($lastResetAt) {
                 $q->where('status', 'hadir');
                 if ($lastResetAt) {
@@ -24,13 +63,11 @@ class UserController extends Controller
                 }
             }]);
 
-        if ($user->role === 'pembina' || $user->role === 'pengurus') {
-            $query->where('organisation_id', $user->organisation_id);
-        } elseif ($user->role !== 'superadmin') {
-            abort(403);
+        if ($selectedRole && in_array($selectedRole, ['superadmin', 'pembina', 'pengurus', 'member'])) {
+            $query->where('role', $selectedRole);
         }
 
-        $users = $query->paginate(10);
+        $users = $query->paginate(15)->withQueryString();
         
         $users->getCollection()->transform(function($u) {
             $count = $u->attendances_count;
@@ -47,8 +84,23 @@ class UserController extends Controller
             return $u;
         });
 
+        $title = 'Anggota';
         $organisation = $user->organisation;
-        return view('users.index', compact('users', 'organisation'));
+        return view('users.index', compact(
+            'title',
+            'users', 
+            'organisation', 
+            'organisations',
+            'divisions',
+            'selectedOrgId',
+            'selectedDivisionId',
+            'selectedRole', 
+            'totalCount', 
+            'memberCount', 
+            'pengurusCount', 
+            'pembinaCount', 
+            'superadminCount'
+        ));
     }
 
     public function exportExcel(Request $request)
@@ -124,7 +176,8 @@ class UserController extends Controller
         } else {
             abort(403);
         }
-        return view('users.create', compact('organisations', 'divisions'));
+        $title = 'Tambah Anggota';
+        return view('users.create', compact('title', 'organisations', 'divisions'));
     }
 
     public function store(Request $request)
@@ -197,7 +250,8 @@ class UserController extends Controller
             $organisations = Organisation::all();
             $divisions = Division::all();
         }
-        return view('users.edit', compact('user', 'organisations', 'divisions'));
+        $title = 'Edit Anggota';
+        return view('users.edit', compact('title', 'user', 'organisations', 'divisions'));
     }
 
     public function update(Request $request, User $user)

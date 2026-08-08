@@ -12,8 +12,9 @@ class OrganisationController extends Controller
         if ($request->user()->role !== 'superadmin') {
             abort(403);
         }
+        $title = 'Organisasi';
         $organisations = Organisation::all();
-        return view('organisations.index', compact('organisations'));
+        return view('organisations.index', compact('title', 'organisations'));
     }
 
     public function create(Request $request)
@@ -21,7 +22,8 @@ class OrganisationController extends Controller
         if ($request->user()->role !== 'superadmin') {
             abort(403);
         }
-        return view('organisations.create');
+        $title = 'Tambah Organisasi';
+        return view('organisations.create', compact('title'));
     }
 
     public function store(Request $request)
@@ -45,7 +47,8 @@ class OrganisationController extends Controller
         if ($request->user()->role !== 'superadmin') {
             abort(403);
         }
-        return view('organisations.edit', compact('organisation'));
+        $title = 'Edit Organisasi';
+        return view('organisations.edit', compact('title', 'organisation'));
     }
 
     public function update(Request $request, Organisation $organisation)

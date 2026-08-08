@@ -53,45 +53,266 @@
         </div>
     </div>
 
-    <!-- Role Specific Summary Icons -->
+    <!-- Role Specific Summary Cards -->
     @if(auth()->user()->role !== 'member')
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        @if(auth()->user()->role === 'pembina')
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        @if(auth()->user()->role === 'superadmin')
+            <!-- Card 1: Total Pengguna -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($users_active_rate ?? 0) >= 50 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100' }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $users_active_rate ?? 0 }}% Aktif
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pengguna</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_users ?? 0 }}</p>
                 </div>
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Anggota</p>
-                <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_users ?? 0 }}</p>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {{ $active_users_count ?? 0 }} pengguna aktif presensi
+                </p>
+            </div>
+
+            <!-- Card 2: Total Sesi -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-600 border border-purple-100">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $sessions_active_rate ?? 0 }}% Aktif Saat Ini
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Sesi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_sessions ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                    {{ $active_sessions ?? 0 }} sesi berlangsung hari ini
+                </p>
+            </div>
+
+            <!-- Card 3: Tingkat Kehadiran -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($attendance_rate ?? 0) >= 75 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : (($attendance_rate ?? 0) >= 50 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-amber-50 text-amber-600 border border-amber-100') }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ ($attendance_rate ?? 0) >= 75 ? 'Optimal' : (($attendance_rate ?? 0) >= 50 ? 'Cukup' : 'Perlu Tingkat') }}
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    {{ $total_attendances ?? 0 }} presensi tercatat
+                </p>
+            </div>
+
+            <!-- Card 4: Sesi Aktif -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            Real-Time
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Sesi Presensi Aktif</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $active_sessions ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    {{ $sessions_active_rate ?? 0 }}% dari total sesi aktif
+                </p>
+            </div>
+
+        @elseif(auth()->user()->role === 'pembina')
+            <!-- Card 1: Total Anggota -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($users_active_rate ?? 0) >= 50 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100' }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $users_active_rate ?? 0 }}% Aktif
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Anggota</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_users ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {{ $active_users_count ?? 0 }} anggota aktif presensi
+                </p>
+            </div>
+
+            <!-- Card 2: Total Sesi -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-600 border border-purple-100">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $sessions_active_rate ?? 0 }}% Aktif Saat Ini
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Sesi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_sessions ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                    {{ $active_sessions ?? 0 }} sesi berlangsung
+                </p>
+            </div>
+
+            <!-- Card 3: Tingkat Kehadiran -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($attendance_rate ?? 0) >= 75 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : (($attendance_rate ?? 0) >= 50 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-amber-50 text-amber-600 border border-amber-100') }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ ($attendance_rate ?? 0) >= 75 ? 'Optimal' : (($attendance_rate ?? 0) >= 50 ? 'Cukup' : 'Perlu Tingkat') }}
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    {{ $total_attendances ?? 0 }} presensi tercatat
+                </p>
+            </div>
+
+            <!-- Card 4: Sesi Aktif -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            Real-Time
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Sesi Aktif</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $active_sessions ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    {{ $sessions_active_rate ?? 0 }}% sesi berlangsung saat ini
+                </p>
+            </div>
+
+        @elseif(auth()->user()->role === 'pengurus')
+            <!-- Card 1: Anggota Divisi -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($members_active_rate ?? 0) >= 50 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100' }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $members_active_rate ?? 0 }}% Aktif
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Anggota Divisi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $members_count ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {{ $active_members_count ?? 0 }} anggota pernah absen
+                </p>
+            </div>
+
+            <!-- Card 2: Total Sesi Divisi -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-600 border border-purple-100">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ $sessions_active_rate ?? 0 }}% Aktif Saat Ini
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Sesi Divisi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $sessions_count ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                    Divisi {{ $division->name ?? 'Divisi' }}
+                </p>
+            </div>
+
+            <!-- Card 3: Tingkat Kehadiran Divisi -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($attendance_rate ?? 0) >= 75 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : (($attendance_rate ?? 0) >= 50 ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-amber-50 text-amber-600 border border-amber-100') }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ ($attendance_rate ?? 0) >= 75 ? 'Optimal' : (($attendance_rate ?? 0) >= 50 ? 'Cukup' : 'Perlu Tingkat') }}
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Kehadiran Divisi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    {{ $attendance_count ?? 0 }} presensi divisi
+                </p>
+            </div>
+
+            <!-- Card 4: Sesi Aktif -->
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            Real-Time
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Sesi Aktif Divisi</p>
+                    <p class="text-3xl font-black text-gray-800 font-outfit">{{ $active_sessions ?? 0 }}</p>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    {{ $sessions_active_rate ?? 0 }}% sesi berlangsung saat ini
+                </p>
             </div>
         @endif
-
-        @if(auth()->user()->role === 'pengurus')
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Anggota Divisi</p>
-                <p class="text-3xl font-black text-gray-800 font-outfit">{{ $members_count ?? $total_members ?? 0 }}</p>
-            </div>
-        @endif
-
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-            <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
-            <p class="text-3xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? $avg_attendance ?? 0 }}{{ is_numeric($attendance_rate ?? $avg_attendance ?? 0) ? '%' : '' }}</p>
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-            <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            </div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Sesi Aktif</p>
-            <p class="text-3xl font-black text-gray-800 font-outfit">{{ $active_sessions ?? $sessions_count ?? $total_sessions ?? 0 }}</p>
-        </div>
     </div>
+    @endif
 
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 animate-fade-in">
@@ -117,7 +338,6 @@
             </div>
         </div>
     </div>
-    @endif
 
     @if(auth()->user()->role === 'member')
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -205,12 +425,18 @@
             <div class="bg-orens rounded-[32px] p-5 sm:p-8 flex flex-col justify-between text-white shadow-xl shadow-orens/20 relative overflow-hidden group min-h-[180px] sm:min-h-[200px]">
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
                 <div class="relative z-10">
-                    <p class="font-bold uppercase tracking-widest text-[10px] mb-2 opacity-80">Total Partisipasi</p>
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="font-bold uppercase tracking-widest text-[10px] opacity-80">Total Partisipasi</p>
+                        <span class="px-2.5 py-0.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold text-white border border-white/30">
+                            {{ $attendance_rate ?? 0 }}% Kehadiran
+                        </span>
+                    </div>
                     <h4 class="text-5xl sm:text-7xl font-black font-outfit mb-4">{{ $total_join ?? 0 }}</h4>
                 </div>
-                <div class="relative z-10">
-                    <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-orens rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-lg w-full sm:w-auto justify-center">
-                        Lihat Riwayat
+                <div class="relative z-10 flex items-center justify-between">
+                    <span class="text-[10px] font-medium text-white/80">Dari {{ $eligible_sessions_count ?? $total_join }} sesi tersedia</span>
+                    <a href="{{ route('attendance.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-orens rounded-2xl font-bold text-xs hover:scale-105 transition-all shadow-lg justify-center">
+                        Riwayat
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </a>
                 </div>
@@ -218,8 +444,14 @@
 
             <div class="bg-white rounded-[32px] p-5 sm:p-8 border border-gray-100 shadow-sm flex flex-col justify-between min-h-[180px] sm:min-h-[200px]">
                 <div>
-                    <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ ($attendance_rate ?? 0) >= 80 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100' }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            {{ ($attendance_rate ?? 0) >= 80 ? 'Sangat Baik' : 'Perlu Ditingkatkan' }}
+                        </span>
                     </div>
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Tingkat Kehadiran</p>
                     <h4 class="text-4xl sm:text-5xl font-black text-gray-800 font-outfit">{{ $attendance_rate ?? 0 }}%</h4>

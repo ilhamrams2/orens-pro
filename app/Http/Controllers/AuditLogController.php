@@ -17,6 +17,7 @@ class AuditLogController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('audit_logs.index', compact('logs'));
+        $title = 'Log Audit';
+        return view('audit_logs.index', compact('title', 'logs'));
     }
 }

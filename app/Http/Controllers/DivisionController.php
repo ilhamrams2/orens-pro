@@ -19,8 +19,9 @@ class DivisionController extends Controller
             abort(403);
         }
 
+        $title = 'Divisi';
         $divisions = $query->get();
-        return view('divisions.index', compact('divisions'));
+        return view('divisions.index', compact('title', 'divisions'));
     }
 
     public function create(Request $request)
@@ -33,7 +34,8 @@ class DivisionController extends Controller
         } else {
             abort(403);
         }
-        return view('divisions.create', compact('organisations'));
+        $title = 'Tambah Divisi';
+        return view('divisions.create', compact('title', 'organisations'));
     }
 
     public function store(Request $request)
@@ -69,7 +71,8 @@ class DivisionController extends Controller
         } else {
             $organisations = Organisation::all();
         }
-        return view('divisions.edit', compact('division', 'organisations'));
+        $title = 'Edit Divisi';
+        return view('divisions.edit', compact('title', 'division', 'organisations'));
     }
 
     public function update(Request $request, Division $division)
