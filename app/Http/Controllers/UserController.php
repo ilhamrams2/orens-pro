@@ -498,4 +498,43 @@ class UserController extends Controller
 
         return back()->with('success', "Berhasil mengimpor $successCount member.");
     }
+
+    public function downloadCsvTemplate(Request $request)
+    {
+        $authUser = $request->user();
+        if ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
+            abort(403);
+        }
+
+        $filename = 'template_import_anggota.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($authUser) {
+            $file = fopen('php://output', 'w');
+
+            // Add UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            if ($authUser->role === 'superadmin') {
+                fputcsv($file, ['nama', 'email', 'password', 'telepon', 'divisi', 'organisasi']);
+                fputcsv($file, ['Ahmad Pratama', 'ahmad@smkprestasiprima.sch.id', 'Password123!', '081234567890', 'Pengurus', 'PRAMUKA']);
+                fputcsv($file, ['Siti Rahma', 'siti@smaprestasiprima.sch.id', 'Password123!', '089876543210', 'Humas', 'PASKIBRA']);
+            } else {
+                fputcsv($file, ['nama', 'email', 'password', 'telepon', 'divisi']);
+                fputcsv($file, ['Ahmad Pratama', 'ahmad@smkprestasiprima.sch.id', 'Password123!', '081234567890', 'Pengurus']);
+                fputcsv($file, ['Siti Rahma', 'siti@smaprestasiprima.sch.id', 'Password123!', '089876543210', 'Humas']);
+            }
+
+            fclose($file);
+        };
+
+        return response()->streamDownload($callback, $filename, $headers);
+    }
 }

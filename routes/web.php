@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:pembina,pengurus'])->group(function () {
     Route::get('users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
     Route::get('users/export/pdf', [UserController::class, 'exportPdf'])->name('users.export.pdf');
+    Route::get('users/import/template', [UserController::class, 'downloadCsvTemplate'])->name('users.import.template');
     Route::post('users/reset-grades', [UserController::class, 'resetGrades'])->name('users.reset-grades');
     Route::post('users/import', [UserController::class, 'importCsv'])->name('users.import');
     Route::resource('/admin/users', UserController::class);
