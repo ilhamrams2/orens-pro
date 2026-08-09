@@ -101,12 +101,6 @@ class AttendanceSession extends Model
         foreach ($expiredSessions as $session) {
             $session->update(['is_active' => false]);
         }
-
-        // Retroactive check: ensure all inactive sessions have absent members marked as alpha
-        $inactiveSessions = self::where('is_active', false)->get();
-        foreach ($inactiveSessions as $session) {
-            $session->fillAbsentMembersWithAlpha();
-        }
     }
 
     /**

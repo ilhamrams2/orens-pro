@@ -99,37 +99,54 @@ class DashboardController extends Controller
             ];
         });
 
+        $userCountsByOrg = User::where('role', 'member')
+            ->selectRaw('organisation_id, count(*) as count')
+            ->groupBy('organisation_id')
+            ->pluck('count', 'organisation_id');
+
+        $userCountsByDiv = User::where('role', 'member')
+            ->whereNotNull('division_id')
+            ->selectRaw('division_id, count(*) as count')
+            ->groupBy('division_id')
+            ->pluck('count', 'division_id');
+
         $totalExpectedQuery = AttendanceSession::query();
         if ($selectedOrgId) {
             $totalExpectedQuery->where('organisation_id', $selectedOrgId);
         }
-        $totalExpected = $totalExpectedQuery->get()->sum(function($session) {
-            return User::where('organisation_id', $session->organisation_id)
-                ->where(function($q) use ($session) {
-                    if ($session->division_id) $q->where('division_id', $session->division_id);
-                })
-                ->count();
+        $totalExpected = $totalExpectedQuery->get()->sum(function($session) use ($userCountsByOrg, $userCountsByDiv) {
+            if ($session->division_id) {
+                return $userCountsByDiv[$session->division_id] ?? 0;
+            }
+            return $userCountsByOrg[$session->organisation_id] ?? 0;
         });
 
         $attendanceRate = $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 1) : 0;
 
-        // 7-day Trend Data
+        // 7-day Trend Data (single aggregated DB query)
+        $startDate = now()->subDays(6)->startOfDay();
+        $endDate = now()->endOfDay();
+
+        $trendCountsQuery = Attendance::where('status', 'hadir')
+            ->whereBetween('checkin_time', [$startDate, $endDate]);
+
+        if ($selectedOrgId) {
+            $trendCountsQuery->whereHas('session', function($q) use ($selectedOrgId) {
+                $q->where('organisation_id', $selectedOrgId);
+            });
+        }
+
+        $rawTrend = $trendCountsQuery->selectRaw('DATE(checkin_time) as date, COUNT(*) as aggregate')
+            ->groupBy('date')
+            ->pluck('aggregate', 'date');
+
         $trendData = [];
         $trendLabels = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $trendLabels[] = now()->subDays($i)->format('d M');
-
-            $dayCountQuery = Attendance::where('status', 'hadir')
-                ->whereDate('checkin_time', $date);
-
-            if ($selectedOrgId) {
-                $dayCountQuery->whereHas('session', function($q) use ($selectedOrgId) {
-                    $q->where('organisation_id', $selectedOrgId);
-                });
-            }
-
-            $trendData[] = $dayCountQuery->count();
+            $day = now()->subDays($i);
+            $dateStr = $day->toDateString();
+            $trendLabels[] = $day->format('d M');
+            $trendData[] = (int) ($rawTrend[$dateStr] ?? 0);
         }
 
         $divisionChartLabels = [];
@@ -212,28 +229,46 @@ class DashboardController extends Controller
             ];
         });
 
-        $totalExpected = AttendanceSession::where('organisation_id', $orgId)->get()->sum(function($session) use ($orgId) {
-            return User::where('organisation_id', $orgId)
-                ->where(function($q) use ($session) {
-                    if ($session->division_id) $q->where('division_id', $session->division_id);
-                })
-                ->count();
+        $userCountsByOrg = User::where('role', 'member')
+            ->where('organisation_id', $orgId)
+            ->count();
+
+        $userCountsByDiv = User::where('role', 'member')
+            ->where('organisation_id', $orgId)
+            ->whereNotNull('division_id')
+            ->selectRaw('division_id, count(*) as count')
+            ->groupBy('division_id')
+            ->pluck('count', 'division_id');
+
+        $totalExpected = AttendanceSession::where('organisation_id', $orgId)->get()->sum(function($session) use ($userCountsByOrg, $userCountsByDiv) {
+            if ($session->division_id) {
+                return $userCountsByDiv[$session->division_id] ?? 0;
+            }
+            return $userCountsByOrg;
         });
 
         $attendanceRate = $totalExpected > 0 ? round(($totalAttendances / $totalExpected) * 100, 1) : 0;
 
-        // 7-day Trend Data
+        // 7-day Trend Data (single aggregated DB query)
+        $startDate = now()->subDays(6)->startOfDay();
+        $endDate = now()->endOfDay();
+
+        $rawTrend = Attendance::where('status', 'hadir')
+            ->whereBetween('checkin_time', [$startDate, $endDate])
+            ->whereHas('session', function($q) use ($orgId) {
+                $q->where('organisation_id', $orgId);
+            })
+            ->selectRaw('DATE(checkin_time) as date, COUNT(*) as aggregate')
+            ->groupBy('date')
+            ->pluck('aggregate', 'date');
+
         $trendData = [];
         $trendLabels = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $trendLabels[] = now()->subDays($i)->format('d M');
-            $trendData[] = Attendance::where('status', 'hadir')
-                ->whereDate('checkin_time', $date)
-                ->whereHas('session', function($q) use ($orgId) {
-                    $q->where('organisation_id', $orgId);
-                })
-                ->count();
+            $day = now()->subDays($i);
+            $dateStr = $day->toDateString();
+            $trendLabels[] = $day->format('d M');
+            $trendData[] = (int) ($rawTrend[$dateStr] ?? 0);
         }
 
         $divisionChartLabels = [];
@@ -300,18 +335,26 @@ class DashboardController extends Controller
             ->count();
         $sessionsActiveRate = $sessionsCount > 0 ? round(($activeSessionsCount / $sessionsCount) * 100, 1) : 0;
 
-        // 7-day Trend Data
+        // 7-day Trend Data (single aggregated DB query)
+        $startDate = now()->subDays(6)->startOfDay();
+        $endDate = now()->endOfDay();
+
+        $rawTrend = Attendance::where('status', 'hadir')
+            ->whereBetween('checkin_time', [$startDate, $endDate])
+            ->whereHas('session', function($q) use ($division) {
+                $q->where('division_id', $division->id);
+            })
+            ->selectRaw('DATE(checkin_time) as date, COUNT(*) as aggregate')
+            ->groupBy('date')
+            ->pluck('aggregate', 'date');
+
         $trendData = [];
         $trendLabels = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $trendLabels[] = now()->subDays($i)->format('d M');
-            $trendData[] = Attendance::where('status', 'hadir')
-                ->whereDate('checkin_time', $date)
-                ->whereHas('session', function($q) use ($division) {
-                    $q->where('division_id', $division->id);
-                })
-                ->count();
+            $day = now()->subDays($i);
+            $dateStr = $day->toDateString();
+            $trendLabels[] = $day->format('d M');
+            $trendData[] = (int) ($rawTrend[$dateStr] ?? 0);
         }
 
         $divisionChartLabels = [$division->name];
