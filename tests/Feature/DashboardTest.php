@@ -33,7 +33,7 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Ringkasan Portal');
-        $response->assertSee('Total Pengguna');
+        $response->assertSee('Total Anggota');
         $response->assertSee('% Aktif');
     }
 
