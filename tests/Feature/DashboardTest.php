@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Organisation;
 use App\Models\Division;
+use App\Models\AttendanceSession;
+use App\Models\Attendance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -105,5 +107,71 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Total Partisipasi');
         $response->assertSee('Tingkat Kehadiran');
+    }
+
+    public function test_attendance_rate_excludes_alpha_records()
+    {
+        $org = Organisation::create([
+            'name' => 'Org Epsilon',
+            'address' => 'Yogyakarta'
+        ]);
+
+        $pembina = User::create([
+            'organisation_id' => $org->id,
+            'name' => 'Pembina Epsilon',
+            'email' => 'pembina_eps@orens.pro',
+            'password' => bcrypt('password'),
+            'role' => 'pembina'
+        ]);
+
+        $member1 = User::create([
+            'organisation_id' => $org->id,
+            'name' => 'Member 1',
+            'email' => 'm1@orens.pro',
+            'password' => bcrypt('password'),
+            'role' => 'member'
+        ]);
+
+        $member2 = User::create([
+            'organisation_id' => $org->id,
+            'name' => 'Member 2',
+            'email' => 'm2@orens.pro',
+            'password' => bcrypt('password'),
+            'role' => 'member'
+        ]);
+
+        $session = AttendanceSession::create([
+            'organisation_id' => $org->id,
+            'title' => 'Test Session',
+            'session_date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '10:00:00',
+            'qr_token' => 'token123',
+            'is_active' => false,
+            'created_by' => $pembina->id,
+        ]);
+
+        // Member 1 is hadir, Member 2 is alpha
+        Attendance::create([
+            'session_id' => $session->id,
+            'user_id' => $member1->id,
+            'status' => 'hadir',
+            'checkin_time' => now(),
+        ]);
+
+        Attendance::create([
+            'session_id' => $session->id,
+            'user_id' => $member2->id,
+            'status' => 'alpha',
+            'checkin_time' => null,
+        ]);
+
+        $response = $this->actingAs($pembina)->get('/dashboard');
+        $response->assertStatus(200);
+
+        // Total expected = 2 members * 1 session = 2
+        // Only 1 is hadir (50%)
+        $response->assertViewHas('attendance_rate', 50.0);
+        $response->assertViewHas('total_attendances', 1);
     }
 }

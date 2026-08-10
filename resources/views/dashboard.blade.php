@@ -57,7 +57,7 @@
     @if(auth()->user()->role !== 'member')
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         @if(auth()->user()->role === 'superadmin')
-            <!-- Card 1: Total Pengguna -->
+            <!-- Card 1: Total Anggota -->
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-4">
@@ -69,12 +69,12 @@
                             {{ $users_active_rate ?? 0 }}% Aktif
                         </span>
                     </div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pengguna</p>
+                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Total Anggota</p>
                     <p class="text-3xl font-black text-gray-800 font-outfit">{{ $total_users ?? 0 }}</p>
                 </div>
                 <p class="text-[11px] text-gray-400 mt-3 font-semibold flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    {{ $active_users_count ?? 0 }} pengguna aktif presensi
+                    {{ $active_users_count ?? 0 }} anggota aktif presensi
                 </p>
             </div>
 
@@ -704,37 +704,59 @@
                 }
             });
 
-            // Bar Chart (Division Performance)
+            // Doughnut Chart (Division Performance)
             const divCtx = document.getElementById('divisionChart').getContext('2d');
+            const divisionColors = [
+                '#FF6B00', // Orens
+                '#3B82F6', // Blue
+                '#10B981', // Emerald
+                '#8B5CF6', // Purple
+                '#EC4899', // Pink
+                '#F59E0B', // Amber
+                '#06B6D4', // Cyan
+                '#64748B'  // Slate
+            ];
             new Chart(divCtx, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
                     labels: @json($division_chart_labels ?? []),
                     datasets: [{
-                        label: 'Persentase Kehadiran (%)',
+                        label: 'Persentase Kehadiran',
                         data: @json($division_chart_data ?? []),
-                        backgroundColor: 'rgba(59, 130, 246, 0.85)',
-                        hoverBackgroundColor: '#3B82F6',
-                        borderRadius: 12,
-                        borderSkipped: false
+                        backgroundColor: divisionColors,
+                        hoverOffset: 8,
+                        borderWidth: 3,
+                        borderColor: '#FFFFFF'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '68%',
                     plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { callback: value => value + '%', color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
-                            grid: { color: '#F3F4F6' }
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 14,
+                                font: {
+                                    family: 'Outfit',
+                                    size: 11,
+                                    weight: 'bold'
+                                },
+                                color: '#4B5563'
+                            }
                         },
-                        x: {
-                            ticks: { color: '#9CA3AF', font: { family: 'Outfit', weight: 'bold' } },
-                            grid: { display: false }
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return ` ${label}: ${value}% Kehadiran`;
+                                }
+                            }
                         }
                     }
                 }

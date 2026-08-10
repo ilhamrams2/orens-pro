@@ -52,12 +52,13 @@ class AttendanceController extends Controller
     public function report(Request $request, AttendanceSession $session)
     {
         $user = $request->user();
-        // Only Superadmin or Admin (Pembina) can see reports
-        if ($user->role !== 'superadmin' && $user->role !== 'pembina') {
+        if ($user->role !== 'superadmin' && $user->role !== 'pembina' && $user->role !== 'pengurus') {
             abort(403);
         }
-        // Admin must be from the same organisation
-        if ($user->role === 'pembina' && $session->organisation_id !== $user->organisation_id) {
+        if (in_array($user->role, ['pembina', 'pengurus']) && $session->organisation_id !== $user->organisation_id) {
+            abort(403);
+        }
+        if ($user->role === 'pengurus' && $session->division_id && $session->division_id !== $user->division_id) {
             abort(403);
         }
 

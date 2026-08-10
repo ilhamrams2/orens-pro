@@ -53,6 +53,8 @@ class AttendanceSessionTest extends TestCase
 
     public function test_expired_sessions_are_automatically_deactivated_and_absent_members_are_marked_alpha()
     {
+        \Carbon\Carbon::setTestNow(now()->setTime(12, 0, 0));
+
         // Create an expired session that is marked as active in DB
         $expiredSession = AttendanceSession::create([
             'organisation_id' => $this->organisation->id,
@@ -100,6 +102,55 @@ class AttendanceSessionTest extends TestCase
             'session_id' => $expiredSession->id,
             'user_id' => $this->member->id,
             'status' => 'alpha',
+        ]);
+    }
+
+    public function test_cannot_assign_division_belonging_to_another_organisation()
+    {
+        $superadmin = User::create([
+            'name' => 'Superadmin',
+            'email' => 'superadmin@smkprestasiprima.sch.id',
+            'password' => bcrypt('password'),
+            'role' => 'superadmin',
+        ]);
+
+        $org2 = Organisation::create([
+            'name' => 'Orens School',
+            'address' => 'Gedung B',
+        ]);
+
+        $divisionOrg2 = Division::create([
+            'organisation_id' => $org2->id,
+            'name' => 'Cyber Security',
+        ]);
+
+        // Attempting to create session for Organisation 1 but specifying a Division from Organisation 2 should fail validation
+        $response = $this->actingAs($superadmin)->post(route('sessions.store'), [
+            'title' => 'Invalid Division Session',
+            'session_date' => now()->toDateString(),
+            'start_time' => '08:00',
+            'end_time' => '10:00',
+            'organisation_id' => $this->organisation->id,
+            'division_id' => $divisionOrg2->id,
+        ]);
+
+        $response->assertSessionHasErrors(['division_id']);
+
+        // Valid creation with matching division
+        $responseValid = $this->actingAs($superadmin)->post(route('sessions.store'), [
+            'title' => 'Valid Session',
+            'session_date' => now()->toDateString(),
+            'start_time' => '08:00',
+            'end_time' => '10:00',
+            'organisation_id' => $this->organisation->id,
+            'division_id' => $this->division->id,
+        ]);
+
+        $responseValid->assertRedirect(route('sessions.index'));
+        $this->assertDatabaseHas('attendance_sessions', [
+            'title' => 'Valid Session',
+            'organisation_id' => $this->organisation->id,
+            'division_id' => $this->division->id,
         ]);
     }
 }

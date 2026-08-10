@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:pembina,pengurus'])->group(function () {
     Route::get('users/import/template', [UserController::class, 'downloadCsvTemplate'])->name('users.import.template');
     Route::post('users/reset-grades', [UserController::class, 'resetGrades'])->name('users.reset-grades');
     Route::post('users/import', [UserController::class, 'importCsv'])->name('users.import');
+    Route::delete('users/purge-members', [UserController::class, 'purgeMembers'])->name('users.purge-members');
     Route::resource('/admin/users', UserController::class);
     Route::resource('/sessions', AttendanceSessionController::class);
     Route::get('/sessions/{session}/qr', [AttendanceSessionController::class, 'getQr'])->name('sessions.qr');

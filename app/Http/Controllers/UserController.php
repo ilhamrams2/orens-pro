@@ -114,14 +114,20 @@ class UserController extends Controller
     public function exportPdf(Request $request)
     {
         $user = $request->user();
+        $orgId = in_array($user->role, ['pembina', 'pengurus']) ? $user->organisation_id : null;
+        $lastResetAt = $orgId ? Organisation::find($orgId)?->last_grade_reset_at : null;
+
         $query = User::with(['organisation', 'division'])
-            ->withCount(['attendances' => function($q) {
+            ->withCount(['attendances' => function($q) use ($lastResetAt) {
                 $q->where('status', 'hadir');
+                if ($lastResetAt) {
+                    $q->where('created_at', '>', $lastResetAt);
+                }
             }])
             ->where('role', 'member');
 
-        if (in_array($user->role, ['pembina', 'pengurus'])) {
-            $query->where('organisation_id', $user->organisation_id);
+        if ($orgId) {
+            $query->where('organisation_id', $orgId);
         }
 
         $users = $query->get()->map(function($u) {
@@ -202,13 +208,23 @@ class UserController extends Controller
         ];
 
         if ($user->role === 'pembina') {
-            $rules['role'] = 'required|in:pengurus,member';
+            $rules['role'] = 'required|in:pembina,pengurus,member';
             $rules['organisation_id'] = 'required|in:'.$user->organisation_id;
-            $rules['division_id'] = 'nullable|exists:divisions,id';
+            $rules['division_id'] = [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($user) {
+                    return $query->where('organisation_id', $user->organisation_id);
+                }),
+            ];
         } elseif ($user->role === 'superadmin') {
             $rules['role'] = 'required|in:superadmin,pembina,pengurus,member';
             $rules['organisation_id'] = $request->role === 'superadmin' ? 'nullable' : 'required|exists:organisations,id';
-            $rules['division_id'] = 'nullable|exists:divisions,id';
+            $rules['division_id'] = [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($request) {
+                    return $query->where('organisation_id', $request->organisation_id);
+                }),
+            ];
         }
 
         $request->validate($rules);
@@ -279,13 +295,23 @@ class UserController extends Controller
         ];
 
         if ($authUser->role === 'pembina') {
-            $rules['role'] = 'required|in:pengurus,member';
+            $rules['role'] = 'required|in:pembina,pengurus,member';
             $rules['organisation_id'] = 'required|in:'.$authUser->organisation_id;
-            $rules['division_id'] = 'nullable|exists:divisions,id';
+            $rules['division_id'] = [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($authUser) {
+                    return $query->where('organisation_id', $authUser->organisation_id);
+                }),
+            ];
         } elseif ($authUser->role === 'superadmin') {
             $rules['role'] = 'required|in:superadmin,pembina,pengurus,member';
             $rules['organisation_id'] = $request->role === 'superadmin' ? 'nullable' : 'required|exists:organisations,id';
-            $rules['division_id'] = 'nullable|exists:divisions,id';
+            $rules['division_id'] = [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($request) {
+                    return $query->where('organisation_id', $request->organisation_id);
+                }),
+            ];
         }
 
         $request->validate($rules);
@@ -536,5 +562,31 @@ class UserController extends Controller
         };
 
         return response()->streamDownload($callback, $filename, $headers);
+    }
+
+    public function purgeMembers(Request $request)
+    {
+        $authUser = $request->user();
+        if ($authUser->role !== 'superadmin' && $authUser->role !== 'pembina') {
+            abort(403);
+        }
+
+        $query = User::whereIn('role', ['member', 'pengurus'])
+            ->where('id', '!=', $authUser->id);
+
+        if ($authUser->role === 'pembina') {
+            $query->where('organisation_id', $authUser->organisation_id);
+        } elseif ($request->filled('organisation_id')) {
+            $query->where('organisation_id', $request->organisation_id);
+        }
+
+        $deletedCount = $query->count();
+        if ($deletedCount === 0) {
+            return redirect()->route('users.index')->with('error', 'Tidak ada akun Member atau Pengurus yang dapat dihapus.');
+        }
+
+        $query->delete();
+
+        return redirect()->route('users.index')->with('success', "Berhasil menghapus $deletedCount akun Member & Pengurus.");
     }
 }

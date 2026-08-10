@@ -254,9 +254,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
                 const confirmAttr = form.getAttribute('onsubmit');
-                const match = confirmAttr ? confirmAttr.match(/confirm\(['"](.+?)['"]\)/) : null;
-                const message = match ? match[1] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+                const match = confirmAttr ? confirmAttr.match(/confirm\((['"])([\s\S]+?)\1\)/) : null;
+                const rawMessage = match ? match[2] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
                 
+                // Convert \n or escaped \n to HTML line breaks and clean quotes
+                const formattedHtml = rawMessage
+                    .replace(/\\n/g, '<br>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/\\'/g, "'")
+                    .replace(/\\"/g, '"');
+
                 // Remove the native onsubmit attribute so it doesn't trigger the browser alert
                 form.removeAttribute('onsubmit');
                 
@@ -268,7 +275,7 @@
                     e.preventDefault();
                     Swal.fire({
                         title: 'Konfirmasi Tindakan',
-                        text: message,
+                        html: `<div class="text-sm text-gray-600 font-medium leading-relaxed">${formattedHtml}</div>`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#FF6B00',

@@ -7,6 +7,7 @@ use App\Models\Organisation;
 use App\Models\Division;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AttendanceSessionController extends Controller
@@ -90,7 +91,12 @@ class AttendanceSessionController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
             'organisation_id' => 'required|exists:organisations,id',
-            'division_id' => 'nullable|exists:divisions,id',
+            'division_id' => [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($request) {
+                    return $query->where('organisation_id', $request->organisation_id);
+                }),
+            ],
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'radius' => 'nullable|integer|min:1',
@@ -150,6 +156,13 @@ class AttendanceSessionController extends Controller
             'session_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
+            'organisation_id' => 'required|exists:organisations,id',
+            'division_id' => [
+                'nullable',
+                Rule::exists('divisions', 'id')->where(function ($query) use ($request) {
+                    return $query->where('organisation_id', $request->organisation_id);
+                }),
+            ],
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'radius' => 'nullable|integer|min:1',

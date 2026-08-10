@@ -46,7 +46,7 @@
                             class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none focus:border-orens focus:ring-4 focus:ring-orens/10 transition-all">
                             <option value="">Global (Semua Divisi)</option>
                             @foreach($divisions as $div)
-                                <option value="{{ $div->id }}" {{ old('division_id', $session->division_id ?? '') == $div->id ? 'selected' : '' }}>
+                                <option value="{{ $div->id }}" data-organisation-id="{{ $div->organisation_id }}" {{ old('division_id', $session->division_id ?? '') == $div->id ? 'selected' : '' }}>
                                     {{ $div->name }}
                                 </option>
                             @endforeach
@@ -119,6 +119,49 @@
                             alert("Geolokasi tidak didukung oleh peramban ini.");
                         }
                     }
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const orgSelect = document.querySelector('select[name="organisation_id"]');
+                        const divSelect = document.querySelector('select[name="division_id"]');
+
+                        if (orgSelect && divSelect) {
+                            const allDivOptions = Array.from(divSelect.querySelectorAll('option'));
+
+                            function updateDivisionOptions(isUserChange = false) {
+                                const selectedOrgId = orgSelect.value;
+                                const currentSelectedDivId = divSelect.value;
+
+                                divSelect.innerHTML = '';
+                                let hasMatchingSelected = false;
+
+                                allDivOptions.forEach(option => {
+                                    const orgId = option.getAttribute('data-organisation-id');
+                                    if (!orgId || orgId === selectedOrgId) {
+                                        const clonedOpt = option.cloneNode(true);
+                                        if (clonedOpt.value === currentSelectedDivId && currentSelectedDivId !== "") {
+                                            clonedOpt.selected = true;
+                                            hasMatchingSelected = true;
+                                        } else if (currentSelectedDivId === "" && clonedOpt.value === "") {
+                                            clonedOpt.selected = true;
+                                        } else {
+                                            clonedOpt.selected = false;
+                                        }
+                                        divSelect.appendChild(clonedOpt);
+                                    }
+                                });
+
+                                if (isUserChange && !hasMatchingSelected) {
+                                    divSelect.value = '';
+                                }
+                            }
+
+                            orgSelect.addEventListener('change', function() {
+                                updateDivisionOptions(true);
+                            });
+
+                            updateDivisionOptions(false);
+                        }
+                    });
                 </script>
 
                 @if(isset($session))
