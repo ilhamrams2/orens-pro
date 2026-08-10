@@ -73,6 +73,29 @@
 
         <!-- Form Section -->
         <div class="lg:col-span-8">
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-100 text-green-600 px-6 py-4 rounded-2xl font-medium text-sm mb-6 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl font-medium text-sm mb-6 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl font-medium text-sm mb-6">
+                    <p class="font-bold mb-1">Gagal memperbarui profil:</p>
+                    <ul class="list-disc list-inside text-xs space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('profile.update') }}" method="POST" class="space-y-8">
                 @csrf
                 

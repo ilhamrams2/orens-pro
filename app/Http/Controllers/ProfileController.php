@@ -31,7 +31,7 @@ class ProfileController extends Controller
                     }
                 },
             ],
-            'password' => ['nullable', 'confirmed', Password::defaults()],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user->fill([
